@@ -121,4 +121,6 @@ Cobrir no mínimo:
 - [ ] Seção "Integração com o sistema existente" nomeia ≥ 4 caminhos de arquivo **que
       existem** no repositório.
 - [ ] Nenhuma decisão é reaberta; nenhum item de negócio é repetido do PRD.
+- [ ] Sem `[hh:mm]` nem citações de fonte no corpo; toda afirmação verificável tem linha
+      no `docs/TRACKER.md`.
 - [ ] Nenhum item descartado/adiado aparece.

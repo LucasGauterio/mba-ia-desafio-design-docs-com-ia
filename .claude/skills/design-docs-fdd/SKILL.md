@@ -38,9 +38,12 @@ description: >-
    reais** e descrever a integração de cada. Usar os PE do `integration-points.md`. Cobrir
    pelo menos `src/modules/orders/order.service.ts`, `src/shared/errors/*`,
    `src/middlewares/auth.middleware.ts`, `src/config/database.ts` (worker com Prisma próprio).
-7. Ao terminar o texto, **invocar `design-docs-diagrams`** para gerar
+7. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp** em nenhuma seção. Caminhos de
+   arquivo do código (`src/...`, `prisma/...`) são conteúdo técnico e aparecem normalmente.
+   A origem de cada afirmação vai para o Tracker.
+8. Ao terminar o texto, **invocar `design-docs-diagrams`** para gerar
    `docs/diagrams/webhooks-diagrams.md`.
-8. Atualizar as linhas `fdd` (e depois `diagrams`) em `docs/_workbench/run-state.md`.
+9. Atualizar as linhas `fdd` (e depois `diagrams`) em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -54,5 +57,7 @@ description: >-
 - [ ] Fluxos cobrem outbox, worker, retry, DLQ.
 - [ ] Observabilidade cita métricas, logs e tracing.
 - [ ] Seção 12 nomeia ≥ 4 caminhos de arquivo que existem no repositório.
+- [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
+- [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Não repete narrativa de negócio do PRD nem reabre decisão de ADR.
 - [ ] `docs/diagrams/webhooks-diagrams.md` gerado.

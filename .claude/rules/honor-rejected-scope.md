@@ -4,7 +4,7 @@ Identificar o que **não** entra é tão importante quanto o que entra. Os itens
 explicitamente descartados ou adiados na reunião. **Nenhum deles pode aparecer como
 requisito, decisão ou contrato** nos documentos. Eles podem, e devem, aparecer em:
 
-- PRD → seção "Fora de escopo" (com a fala de origem).
+- PRD → seção "Fora de escopo" (situação em prosa, sem timestamp).
 - RFC → seção "Questões em aberto" (para os que ficaram de "observar e decidir depois").
 
 | Item | Situação | Origem |

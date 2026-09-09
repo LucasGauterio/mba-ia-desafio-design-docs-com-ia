@@ -44,24 +44,24 @@ readme, validation. Checkpoints de revisão após `ledger`, após `adr+rfc`, ap�
 
 ## Convenção de worktrees
 
-Todas as worktrees ficam na **pasta pai do repositório** (`../`, ex. `G:/Projects/`),
-nunca dentro do repo.
+Todas as worktrees de execução ficam **dentro do projeto**, em `.worktrees/`, que é
+gitignored (nunca versionado).
 
 | Papel | Branch | Worktree |
 |---|---|---|
 | Entregável e workflow | `dev` | checkout principal |
-| Cada execução de teste | `design-docs/<timestamp>` | `../design-docs-run-<timestamp>` |
+| Cada execução de teste | `design-docs/<timestamp>` | `.worktrees/design-docs-run-<timestamp>` |
 
 ### Runbook de uma execução de teste
 
 ```
 RUN=$(date +%Y%m%d-%H%M%S)
-git worktree add -b design-docs/$RUN ../design-docs-run-$RUN dev
-cd ../design-docs-run-$RUN
+git worktree add -b design-docs/$RUN .worktrees/design-docs-run-$RUN dev
+cd .worktrees/design-docs-run-$RUN
 claude -p "/design-docs" --permission-mode acceptEdits --output-format stream-json | tee run.log
 claude -p "/design-docs-validate" --permission-mode acceptEdits | tee validation.md
 # ler validation.md; se houver falhas, corrigir os assets em dev e refazer a run
-git worktree remove ../design-docs-run-$RUN     # ao terminar
+cd ../.. && git worktree remove .worktrees/design-docs-run-$RUN     # ao terminar
 ```
 
 Correções vão sempre nos **assets do workflow** em `dev`, nunca na worktree da run. Cada

@@ -26,13 +26,15 @@ description: >-
    entregas (GET deliveries), replay de DLQ (admin), assinatura HMAC no envio, rotação de
    secret, at-least-once com `X-Event-Id`.
 3. **Objetivos e métricas:** ≥ 1 com meta quantitativa (ex.: "evento entregue em < 10 s no
-   caminho feliz"; base: clientes consideram "tempo real" abaixo de 10 s, `[09:02]` Marcos).
+   caminho feliz"; base: os clientes consideram "tempo real" abaixo de 10 s).
 4. **Fora de escopo:** ≥ 2 itens de `.claude/rules/honor-rejected-scope.md`, cada um com a
-   fala de origem.
+   situação em prosa ("adiado para a próxima fase", "fora de escopo, projeto do frontend"),
+   sem timestamp.
 5. **Riscos:** ≥ 2 completos (probabilidade, impacto, mitigação em subitens, contingência).
 6. **Decisões e trade-offs:** resumo; o detalhe fica nos ADRs (linkar, não repetir).
 7. Nível de produto: **não** descer a endpoints, códigos de erro ou infra.
-8. Atualizar a linha `prd` em `docs/_workbench/run-state.md`.
+8. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp.** A origem vai para o Tracker.
+9. Atualizar a linha `prd` em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -41,8 +43,10 @@ description: >-
 ## Checklist antes de concluir
 
 - [ ] 12 seções presentes.
-- [ ] ≥ 8 requisitos funcionais, todos com origem na transcrição.
+- [ ] ≥ 8 requisitos funcionais, todos discutidos na reunião.
 - [ ] ≥ 1 objetivo com métrica e meta quantitativa.
-- [ ] "Fora de escopo" com ≥ 2 itens descartados/adiados + origem.
+- [ ] "Fora de escopo" com ≥ 2 itens descartados/adiados.
 - [ ] "Riscos" com ≥ 2 riscos completos.
+- [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
+- [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Nada contradiz transcrição/código; não desce ao detalhe do FDD.

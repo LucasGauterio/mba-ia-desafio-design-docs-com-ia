@@ -5,7 +5,8 @@ description: >-
   transcrição da reunião para docs/_workbench/transcript-ledger.md, separando
   decisões fechadas, requisitos funcionais, RNFs, restrições, ganchos com o
   código, itens DESCARTADOS, itens ADIADOS e detalhes técnicos secundários. Cada
-  item traz a origem [hh:mm] Nome. Este ledger é a fonte única para PRD/RFC/FDD/ADR.
+  item traz a origem [hh:mm] Nome. É o arquivo de trabalho que alimenta o conteúdo do
+  PRD/RFC/FDD/ADR (prosa, sem timestamps) e as linhas do TRACKER (com timestamps).
 ---
 
 # design-docs-ledger: ledger da transcrição

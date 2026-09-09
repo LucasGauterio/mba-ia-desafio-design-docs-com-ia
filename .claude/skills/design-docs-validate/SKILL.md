@@ -69,6 +69,12 @@ description: >-
   customizados, Iterações e ajustes, Como navegar a entrega.
 - ≥ 1 ferramenta de IA; ≥ 2 blocos de código de prompt; ≥ 2 iterações concretas.
 
+### Prosa limpa (rastreabilidade só no Tracker)
+- `grep -rnE '\[[0-9]{2}:[0-9]{2}\]' docs/PRD.md docs/RFC.md docs/FDD.md docs/adrs/*.md
+  docs/diagrams/*.md README.md CLAUDE.md` → **zero** ocorrências. Timestamps só no
+  `docs/TRACKER.md` e em `docs/_workbench/`.
+- Nenhum travessão longo (em-dash) nesses arquivos.
+
 ### Consistência / anti-escopo
 - Para cada item de `honor-rejected-scope.md`, `grep` nos docs finais: não pode aparecer
   como requisito/decisão (só em "Fora de escopo" / "Questões em aberto").

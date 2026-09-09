@@ -84,6 +84,9 @@ Não alterar `src/`, `prisma/`, `tests/`, configs. `TRANSCRICAO.md` não muda.
 ### Consistência geral
 - [ ] Nenhum requisito/decisão/restrição contradiz a transcrição ou o código.
 - [ ] Nenhum arquivo de código mencionado nos documentos é inexistente no repositório.
+- [ ] PRD, RFC, FDD e ADRs têm prosa limpa: nenhum `[hh:mm]` nem citação de fonte no corpo
+      (rastreabilidade só no `docs/TRACKER.md`).
+- [ ] Nenhum travessão longo (em-dash) nos documentos.
 
 ## Itens que a reunião DESCARTOU ou ADIOU (não podem virar requisito)
 

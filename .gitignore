@@ -10,6 +10,9 @@ coverage/
 .vscode/
 *.tsbuildinfo
 
+# Worktrees de execução do workflow design-docs (descartáveis, dentro do projeto)
+.worktrees/
+
 # Material de referência de terceiros e config local do Claude Code:
 # ficam apenas como arquivos locais, nunca versionados
 .claude/docs/

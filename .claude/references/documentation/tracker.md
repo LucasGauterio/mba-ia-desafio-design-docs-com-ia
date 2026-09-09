@@ -1,8 +1,10 @@
 # Reference · Tracker de rastreabilidade
 
 Baseado no requisito 5 e nas "Dicas Finais" do enunciado. O tracker é uma **exigência do
-desafio**, não um documento padrão de mercado. Serve de defesa contra alucinação: se um
-item de PRD/RFC/FDD/ADR não tem linha aqui com origem preenchida, provavelmente foi inventado.
+desafio**, não um documento padrão de mercado. É o **único** lugar do pacote onde a origem
+de cada item é materializada: PRD/RFC/FDD/ADR têm prosa limpa, sem `[hh:mm]`. Serve de
+defesa contra alucinação: se um item de PRD/RFC/FDD/ADR não tem linha aqui com origem
+preenchida, provavelmente foi inventado.
 
 ## Formato obrigatório da tabela
 

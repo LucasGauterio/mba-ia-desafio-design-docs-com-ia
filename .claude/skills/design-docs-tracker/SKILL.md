@@ -8,9 +8,14 @@ description: >-
 
 # design-docs-tracker: tracker de rastreabilidade
 
+O `docs/TRACKER.md` é o **único** lugar onde a origem de cada item é materializada. O
+PRD/RFC/FDD/ADR têm prosa limpa (sem `[hh:mm]`); esta skill varre esses documentos e liga
+cada afirmação à sua origem aqui.
+
 ## Insumos
 
-- `docs/PRD.md`, `docs/RFC.md`, `docs/FDD.md`, `docs/adrs/*`.
+- `docs/PRD.md`, `docs/RFC.md`, `docs/FDD.md`, `docs/adrs/*` (prosa limpa).
+- `docs/_workbench/transcript-ledger.md` (guarda os timestamps de cada item).
 - `TRANSCRICAO.md` (para validar timestamps).
 - `.claude/references/codebase/*` e o repositório (para validar caminhos).
 - `.claude/references/documentation/tracker.md` (formato + limiares + esquema de IDs).
@@ -22,8 +27,8 @@ description: >-
    alternativa, questão em aberto, contrato, erro, integração, risco, métrica), criar uma
    linha na tabela com ID prefixado (`PRD-FR-01`, `RFC-ALT-02`, `FDD-CONTRATO-03`,
    `FDD-INT-02`, `ADR-002`, ...).
-3. Preencher `Fonte` (`TRANSCRICAO` ou `CODIGO`) e `Localização`:
-   - `TRANSCRICAO` → `[hh:mm] Nome` real, conferido na transcrição.
+3. Preencher `Fonte` (`TRANSCRICAO` ou `CODIGO`) e `Localização`, cruzando com o ledger:
+   - `TRANSCRICAO` → `[hh:mm] Nome` real (vem do ledger), conferido na transcrição.
    - `CODIGO` → caminho de arquivo real, conferido no repositório.
 4. Se um item não tem origem localizável: **voltar ao documento** e corrigir/remover; não
    inventar origem.

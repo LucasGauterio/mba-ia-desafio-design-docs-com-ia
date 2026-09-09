@@ -41,7 +41,7 @@ Estrutura de branches e worktrees (git):
 
 - `dev`: a entrega final validada, que também carrega o workflow reutilizável.
 - `design-docs/<timestamp>`: uma worktree descartável por execução de teste, criada a
-  partir de `dev`, na pasta pai do repositório.
+  partir de `dev` em `.worktrees/` (gitignored).
 
 Ordem de produção (a mesma sugerida pelo enunciado):
 

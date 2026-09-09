@@ -13,7 +13,7 @@ description: >-
 
 - `docs/_workbench/transcript-ledger.md` → seção "Decisões fechadas" + "Detalhes técnicos secundários".
 - `.claude/references/architecture/adr.md` (formato MADR, regra dos 3 Es, lista das 6
-  decisões principais com timestamps).
+  decisões principais).
 - `.claude/references/codebase/*` (para o ADR que referencia o código).
 - `.claude/rules/*`.
 
@@ -30,7 +30,8 @@ description: >-
 5. No ADR de "reuso dos padrões existentes" (candidato natural), referenciar explicitamente
    `src/shared/errors/`, `src/shared/logger/index.ts`, `src/modules/orders/order.service.ts`,
    `src/app.ts`. **Pelo menos 1 ADR** precisa citar o código real.
-6. Cada "Contexto e problema" cita a origem `[hh:mm] Nome`.
+6. **Prosa limpa: nenhum ADR contém `[hh:mm]` nem colchetes de timestamp.** A origem de
+   cada afirmação vai para `docs/TRACKER.md` (gerado depois por `design-docs-tracker`).
 7. Atualizar a linha `adr` em `docs/_workbench/run-state.md`.
 
 ## Saída
@@ -46,4 +47,6 @@ description: >-
 - [ ] Conjunto cobre ≥ 5 das 6 decisões principais.
 - [ ] ≥ 1 ADR referencia arquivos/módulos/classes do código.
 - [ ] Sem trechos de código; ≤ 5 referências por ADR.
+- [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
+- [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Nenhuma decisão inventada; nenhum item descartado/adiado como decisão.

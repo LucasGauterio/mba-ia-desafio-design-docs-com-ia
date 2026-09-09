@@ -54,7 +54,7 @@ trade-off que motivou o descarte.
 
 ### [Alternativa 1]
 - **O que era:** [descrição]
-- **Por que foi descartada:** [trade-off concreto, com a fala de origem]
+- **Por que foi descartada:** [trade-off concreto que motivou o descarte]
 
 ### [Alternativa 2]
 - **O que era:** [descrição]
@@ -62,7 +62,7 @@ trade-off que motivou o descarte.
 
 ## Questões em aberto
 Pelo menos 2 pontos levantados na reunião e não decididos ou adiados.
-- [questão 1: o que ficou de "observar e decidir depois", com a fala de origem]
+- [questão 1: o que ficou de "observar e decidir depois"]
 - [questão 2]
 
 ## Impacto e riscos
@@ -82,7 +82,9 @@ Links para os ADRs do pacote.
 - [ ] TL;DR, contexto, proposta técnica, alternativas, questões em aberto, impacto/riscos,
       decisões relacionadas: todas presentes.
 - [ ] "Alternativas consideradas" com ≥ 2 alternativas descartadas na reunião, cada uma
-      com o trade-off e a fala de origem.
+      com o trade-off que motivou o descarte.
 - [ ] "Questões em aberto" com ≥ 2 pontos adiados/não decididos na reunião.
 - [ ] Linka ≥ 2 ADRs do pacote, com link relativo.
+- [ ] Sem `[hh:mm]` nem citações de fonte no corpo; toda afirmação verificável tem linha
+      no `docs/TRACKER.md`.
 - [ ] 2 a 4 páginas. Não contém payloads, códigos de erro ou detalhe de implementação.

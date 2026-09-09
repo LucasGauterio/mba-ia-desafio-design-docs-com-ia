@@ -87,13 +87,12 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
 
 ## Convenção de worktrees
 
-Todas as worktrees ficam na **pasta pai do repositório** (`../`, por exemplo
-`G:/Projects/`), nunca dentro do repo.
+As worktrees de execução ficam **dentro do projeto**, em `.worktrees/` (gitignored).
 
 | Papel | Branch | Worktree |
 |---|---|---|
 | Entregável e workflow | `dev` | checkout principal |
-| Cada execução de teste | `design-docs/<timestamp>` | `../design-docs-run-<timestamp>` |
+| Cada execução de teste | `design-docs/<timestamp>` | `.worktrees/design-docs-run-<timestamp>` |
 
 ## Teste e iterações
 

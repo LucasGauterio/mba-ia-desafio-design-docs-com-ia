@@ -1,18 +1,32 @@
-# Rule · todo item precisa de fonte identificável
+# Rule · rastreabilidade vive no Tracker, não na prosa
 
 Nenhum requisito, decisão, restrição, contrato, erro, métrica, risco ou alternativa entra
-em um documento sem origem rastreável a **uma** das duas fontes:
+num documento sem **origem identificável** em uma das duas fontes:
 
-- **Transcrição**: `TRANSCRICAO.md`, referenciada como `[hh:mm] Nome` (timestamp e falante
-  reais). Ex.: `[09:17] Diego`.
-- **Código**: um caminho de arquivo que existe no repositório. Ex.:
-  `src/modules/orders/order.service.ts`.
+- **Transcrição**: `TRANSCRICAO.md`, um trecho real (`[hh:mm] Nome`, timestamp e falante reais).
+- **Código**: um caminho de arquivo que existe no repositório.
 
-Se você não consegue apontar a origem de um item:
+## Onde a origem aparece
+
+- **No `docs/TRACKER.md`**: cada afirmação verificável dos documentos tem **uma linha** na
+  tabela, com a coluna `Localização` preenchida (`[hh:mm] Nome` para `TRANSCRICAO`, caminho
+  de arquivo para `CODIGO`). Este é o único lugar onde a origem é materializada.
+- **Não no corpo do PRD / RFC / FDD / ADR**: a prosa fica limpa. Não use `[hh:mm]`,
+  colchetes de timestamp nem "(Fulano, 09:17)" no texto. Quando ajudar a leitura, use
+  atribuição natural, sem marcação: "discutido na reunião", "definido pela equipe de
+  segurança", "decisão do time".
+- **Exceção**: caminhos de arquivo do código (`src/...`, `prisma/...`) **podem** aparecer
+  na prosa, porque são conteúdo técnico, não citação de fonte. A seção "Integração com o
+  sistema existente" do FDD e a seção "Referências" dos ADRs os usam normalmente.
+
+## Se você não consegue apontar a origem de um item
 
 1. Verifique se ele realmente foi discutido (releia o trecho da transcrição).
-2. Se foi um preenchimento razoável de lacuna, marque `(hipótese)` e diga em que se baseia.
+2. Se foi um preenchimento razoável de lacuna, marque `(hipótese)` no texto e diga em que se baseia.
 3. Caso contrário, **remova o item**. Não invente uma origem para justificá-lo.
 
-O `docs/TRACKER.md` materializa esta regra: cada item com coluna `Localização` vazia ou
-inventada é uma alucinação mascarada.
+## Cobertura
+
+Ao limpar citações da prosa, **não perca cobertura**: cada afirmação que deixa de citar a
+origem inline continua precisando da sua linha no `docs/TRACKER.md`. A validação exige
+pelo menos 80% dos itens identificáveis com linha correspondente.

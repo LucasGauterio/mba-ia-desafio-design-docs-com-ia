@@ -69,7 +69,8 @@ Pelo menos um objetivo com meta numérica.
 - [item]
 
 **Fora de escopo**
-- [item explicitamente descartado ou adiado na reunião] (mín. 2, cada um com a origem)
+- [item explicitamente descartado ou adiado na reunião] (mín. 2, cada um com a situação
+  em prosa: "adiado para a próxima fase", "projeto separado do time de frontend")
 - [item 2]
 
 ---
@@ -157,11 +158,13 @@ Checklist objetivo e verificável de quando a feature está pronta.
 ## Checklist (o PRD só está pronto quando)
 
 - [ ] Todas as seções acima presentes.
-- [ ] ≥ 8 requisitos funcionais, todos com origem na transcrição.
+- [ ] ≥ 8 requisitos funcionais, todos discutidos na reunião.
 - [ ] ≥ 1 objetivo com métrica e meta quantitativa.
 - [ ] "Fora de escopo" com ≥ 2 itens explicitamente descartados/adiados, cada um com a
-      fala de origem.
+      situação em prosa.
 - [ ] "Riscos" com ≥ 2 riscos completos (probabilidade + impacto + mitigação).
+- [ ] Sem `[hh:mm]` nem citações de fonte no corpo; toda afirmação verificável tem linha
+      no `docs/TRACKER.md`.
 - [ ] Nenhum requisito contradiz a transcrição ou o código.
 - [ ] Não desce ao detalhe de implementação (isso é do FDD).
 - [ ] Produzido por último entre os grandes documentos (consolida ADR + RFC + FDD).
