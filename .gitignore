@@ -9,3 +9,11 @@ coverage/
 .idea/
 .vscode/
 *.tsbuildinfo
+
+# Material de referência de terceiros e config local do Claude Code:
+# ficam apenas como arquivos locais, nunca versionados
+.claude/docs/
+.claude/resumos/
+.claude/plans/
+.claude/settings.json
+.claude/settings.local.json
