@@ -31,7 +31,8 @@ FDD, ADRs, Tracker e este README, sem inventar requisitos.]
 
 ## Workflow adotado
 [Ordem: baseline do código → ledger da transcrição + checklist da spec → ADRs → RFC →
-FDD (+ diagramas) → PRD → Tracker → este README. Como a interação com a IA foi organizada:
+FDD (com diagramas embutidos) → PRD → Tracker → este README. Como a interação com a IA foi
+organizada:
 skills por documento, references de método em `.claude/references/`, worktrees por execução.]
 
 ## Prompts customizados
@@ -49,7 +50,7 @@ Caminho dos arquivos e ordem sugerida de leitura:
 2. `docs/PRD.md`: por quê e o quê
 3. `docs/RFC.md`: proposta técnica
 4. `docs/adrs/`: decisões
-5. `docs/FDD.md` + `docs/diagrams/`: como implementar
+5. `docs/FDD.md` (com a seção de diagramas ao fim): como implementar
 6. `docs/TRACKER.md`: rastreabilidade
 7. `DESIGN_DOCS_PROCESS.md`: o processo completo
 ```

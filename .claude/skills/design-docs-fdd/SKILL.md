@@ -4,7 +4,8 @@ description: >-
   Escreve o FDD (Feature Design Document): o "como implementar" em detalhe,
   acionável para um dev começar a codar. Produz docs/FDD.md com contratos,
   matriz de erros WEBHOOK_*, fluxos e a seção obrigatória "Integração com o
-  sistema existente". Roda depois de design-docs-rfc; ao final aciona design-docs-diagrams.
+  sistema existente". Os diagramas ficam embutidos no próprio FDD (última seção).
+  Roda depois de design-docs-rfc; ao final aciona design-docs-diagrams.
 ---
 
 # design-docs-fdd: FDD da feature
@@ -41,17 +42,18 @@ description: >-
 7. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp** em nenhuma seção. Caminhos de
    arquivo do código (`src/...`, `prisma/...`) são conteúdo técnico e aparecem normalmente.
    A origem de cada afirmação vai para o Tracker.
-8. Ao terminar o texto, **invocar `design-docs-diagrams`** para gerar
-   `docs/diagrams/webhooks-diagrams.md`.
+8. Ao terminar o texto, **invocar `design-docs-diagrams`** para acrescentar a seção
+   "Diagramas" ao fim do próprio `docs/FDD.md` (não há arquivo de diagramas separado).
 9. Atualizar as linhas `fdd` (e depois `diagrams`) em `docs/_workbench/run-state.md`.
 
 ## Saída
 
-`docs/FDD.md` (+ `docs/diagrams/webhooks-diagrams.md` via `design-docs-diagrams`).
+`docs/FDD.md` (a seção "Diagramas" é acrescentada por `design-docs-diagrams`).
 
 ## Checklist antes de concluir
 
-- [ ] 12 seções presentes, incl. "Integração com o sistema existente".
+- [ ] 12 seções presentes, incl. "Integração com o sistema existente" (a 13ª, "Diagramas",
+      vem do `design-docs-diagrams`).
 - [ ] ≥ 4 endpoints com request/response de exemplo e status codes.
 - [ ] Matriz de erros só com `WEBHOOK_*`.
 - [ ] Fluxos cobrem outbox, worker, retry, DLQ.
@@ -60,4 +62,4 @@ description: >-
 - [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
 - [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Não repete narrativa de negócio do PRD nem reabre decisão de ADR.
-- [ ] `docs/diagrams/webhooks-diagrams.md` gerado.
+- [ ] Seção "Diagramas" presente no fim do `docs/FDD.md`.

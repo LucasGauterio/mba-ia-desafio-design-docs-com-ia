@@ -14,7 +14,7 @@ As references são guias compactos e autocontidos, um por tipo de documento. O w
 | `architecture/fdd.md` | esqueleto de 12 seções do FDD, contratos com exemplos, matriz de erros, seção obrigatória de integração, checklist |
 | `architecture/rfc.md` | estrutura do RFC (2 a 4 páginas), metadados, alternativas, questões em aberto, checklist |
 | `architecture/adr.md` | formato MADR de 7 seções, regra dos 3 Es, "uma decisão por ADR", proibições, checklist |
-| `architecture/diagrams.md` | quando um diagrama se justifica, tipos, guardrails de sintaxe Mermaid, estrutura do arquivo |
+| `architecture/diagrams.md` | quando um diagrama se justifica, tipos, guardrails de sintaxe Mermaid, estrutura da seção "Diagramas" do FDD |
 | `architecture/c4.md` | os quatro níveis do modelo C4 (opcional neste pacote) |
 | `requirements/deliverables.default.md` | perfil de entregáveis do desafio: artefatos, seções, contagens, critérios de aceite, itens fora de escopo |
 | `guidelines/ai-as-maestro.md` | papel de maestro, prompts dirigidos, expectativa de iteração, filtragem do que não entra |
@@ -30,6 +30,7 @@ Cada critério do `DESAFIO.md` tem uma reference que o suporta:
 | PRD: seções, mínimo de 8 requisitos, objetivo com meta, fora de escopo, riscos | `documentation/prd.md` + `requirements/deliverables.default.md` |
 | RFC: seções, alternativas com trade-off, questões em aberto, links de ADR | `architecture/rfc.md` |
 | FDD: 12 seções, endpoints, erros `WEBHOOK_*`, arquivos reais, observabilidade | `architecture/fdd.md` + `codebase/integration-points.md` |
+| Diagramas: seção final do FDD, Mermaid, teste de significância | `architecture/diagrams.md` + `architecture/c4.md` |
 | ADRs: 5 a 8 arquivos MADR, cobre 5 das 6 decisões, ao menos 1 cita código | `architecture/adr.md` |
 | Tracker: formato e limiares | `documentation/tracker.md` |
 | README: seções, prompts, iterações | skill `design-docs-readme` |

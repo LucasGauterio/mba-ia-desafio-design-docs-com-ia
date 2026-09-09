@@ -46,5 +46,8 @@
 7. `.claude/design-docs.config.json` (inventado, não previsto pelo `DESAFIO.md`) removido.
    O orquestrador passou a derivar os parâmetros da transcrição informada na própria
    chamada (`/design-docs @TRANSCRICAO.md`).
+8. Diagramas deixaram de ser um arquivo `docs/diagrams/<feature>-diagrams.md` separado e
+   passaram a ser a última seção embutida do `docs/FDD.md` ("13. Diagramas"). A skill
+   `design-docs-diagrams` passou a ser dona dessa seção.
 
 Detalhe completo na seção "Iterações e ajustes" do `README.md`.

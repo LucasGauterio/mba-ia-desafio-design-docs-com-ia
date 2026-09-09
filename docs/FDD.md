@@ -63,6 +63,10 @@ Limites: só webhooks **outbound** (a plataforma envia, o cliente recebe). Só o
 
 ## 4. Fluxos detalhados
 
+Os diagramas de apoio a estes fluxos (sequência da publicação, loop do worker, decisão de
+retry e DLQ, máquina de estados do evento, replay e modelo de dados do módulo) estão na
+seção 13.
+
 ### 4.1 Criação do evento na outbox
 
 1. Um cliente da API chama `PATCH /api/v1/orders/:id/status` (fluxo existente).
@@ -548,3 +552,215 @@ Quatro modelos novos, com as convenções do arquivo (PK `String @id @default(uu
 `nextAttemptAt`, `createdAt`, `deliveredAt`), `webhook_delivery` (`outboxId`, `attempt`,
 `statusCode`, `responseBody`, `durationMs`, `error`, `sentAt`), `webhook_dead_letter`
 (`outboxId`, `webhookEndpointId`, `payload Json`, `lastError`, `failedAt`).
+
+## 13. Diagramas
+
+Diagramas de apoio às seções anteriores. Texto em português; nomes técnicos em inglês. Cada
+diagrama passa no teste de significância: nenhum é redundante com a prosa. Nada aqui
+introduz elemento que não esteja no corpo do FDD.
+
+### 13.1 Publicação do evento na transação de mudança de status
+
+Mostra o caminho feliz da criação do evento (seção 4.1). A chamada de
+`PATCH /orders/:id/status` entra em `OrderService.changeStatus`, que já roda uma transação;
+a novidade é a chamada a `publishWebhookEvent` ainda dentro do mesmo `tx`, que consulta os
+endpoints interessados e insere uma linha por endpoint na outbox. É o diagrama central para
+entender a garantia de atomicidade entre a mudança de status e o registro do evento.
+
+```mermaid
+sequenceDiagram
+    participant C as API Client
+    participant O as OrderService
+    participant P as publishWebhookEvent
+    participant DB as MySQL
+
+    C->>O: PATCH /orders/:id/status
+    O->>DB: BEGIN
+    O->>DB: update order, insert history, ajusta estoque
+    O->>P: publishWebhookEvent(tx, order, from, to)
+    P->>DB: SELECT webhook_endpoint ativos do customer
+    alt algum endpoint quer o status
+        P->>P: renderiza payload snapshot
+        P->>DB: INSERT webhook_outbox (1 por endpoint)
+    else nenhum endpoint interessado
+        P-->>O: retorna sem escrever
+    end
+    O->>DB: COMMIT
+    O-->>C: 200 OK
+```
+
+**Notas:**
+- Se qualquer `INSERT` da outbox falhar, `publishWebhookEvent` lança e o `COMMIT` vira `ROLLBACK`.
+- O payload é renderizado uma vez e reaproveitado para todos os endpoints do customer.
+- Nenhuma chamada de rede acontece dentro da transação.
+
+### 13.2 Loop de processamento do worker
+
+Detalha o ciclo do worker a cada 2 segundos (seção 4.2): seleção dos pendentes, cálculo da
+assinatura, envio HTTP com timeout e registro da tentativa. Esclarece o que não é óbvio a
+partir da API: o worker é um processo separado que só lê e escreve o banco, e a decisão de
+sucesso depende só do código de resposta do cliente.
+
+```mermaid
+flowchart TD
+    A[A cada 2 segundos] --> B[SELECT webhook_outbox<br/>status pending e vencidos]
+    B --> C{Há eventos?}
+    C -->|nao| A
+    C -->|sim| D[Marca processing]
+    D --> E[Resolve secret vigente]
+    E --> F[Calcula X-Signature HMAC-SHA256]
+    F --> G[POST url do endpoint<br/>timeout 10s]
+    G --> H[Grava webhook_delivery]
+    H --> I{Resposta 2xx?}
+    I -->|sim| J[Marca delivered]
+    I -->|nao| K[Trata falha]
+    J --> A
+    K --> A
+```
+
+**Notas:**
+- A seleção ordena por `created_at` ascendente, o que garante ordem por `order_id` com worker único.
+- `webhook_delivery` guarda `attempt`, `status_code`, `duration_ms` e `error` de cada tentativa.
+- Durante o grace period de rotação, a secret anterior também é aceita na verificação do cliente.
+
+### 13.3 Decisão de retry, backoff e DLQ
+
+Foca no que acontece quando um envio falha (seções 4.3 e 4.4). Mostra o incremento do
+contador de tentativas, o agendamento da próxima tentativa pelo array de backoff e a
+passagem para a dead letter queue no limite. É a referência para implementar a resiliência
+descrita na seção 7.
+
+```mermaid
+flowchart TD
+    A[Falha no envio<br/>timeout, nao 2xx ou conexao] --> B[Incrementa attempts]
+    B --> C{attempts menor que 5?}
+    C -->|sim| D[Calcula proximo backoff<br/>1min 5min 30min 2h 12h]
+    D --> E[status pending<br/>next_attempt_at futuro]
+    E --> F[Worker retenta na janela]
+    C -->|nao| G[INSERT webhook_dead_letter<br/>payload, last_error, failed_at]
+    G --> H[status dead_letter na outbox]
+    H --> I[Fora do ciclo do worker]
+```
+
+**Notas:**
+- O agendamento é persistido em `next_attempt_at`, não em timer de memória: um restart do worker não perde retries.
+- São exatamente 5 tentativas; a 5ª falha move o evento para a DLQ.
+- O evento fica na `webhook_outbox` como histórico, marcado `dead_letter`, mas não é mais selecionado.
+
+### 13.4 Estados de um evento na outbox
+
+Diagrama de estados da linha de `webhook_outbox` ao longo da vida. Ajuda a validar as
+transições possíveis e garante que `delivered` e `dead_letter` são terminais.
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: publishWebhookEvent
+    pending --> processing: worker seleciona
+    processing --> delivered: resposta 2xx
+    processing --> pending: falha e attempts menor que 5
+    processing --> dead_letter: falha e attempts igual a 5
+    processing --> pending: worker caiu (lease expira)
+    delivered --> [*]
+    dead_letter --> [*]
+```
+
+**Notas:**
+- A transição `processing -> pending` por lease expirado é o que garante at-least-once quando o worker cai após enviar.
+- `delivered` e `dead_letter` são terminais para aquela linha.
+- Um replay de DLQ cria uma linha **nova** em `pending`, com novo `event_id`.
+
+### 13.5 Replay de item da dead letter queue
+
+Mostra o fluxo administrativo (seção 5.7): o endpoint exige role ADMIN, cria um novo evento
+na outbox a partir do payload guardado e registra quem executou. Esclarece que o replay não
+reusa a linha antiga.
+
+```mermaid
+sequenceDiagram
+    participant A as Admin
+    participant M as auth.middleware
+    participant S as WebhookService
+    participant DB as MySQL
+
+    A->>M: POST /admin/webhooks/dead-letter/:id/replay
+    M->>M: authenticate + requireRole ADMIN
+    alt role insuficiente
+        M-->>A: 403 FORBIDDEN
+    else role ADMIN
+        M->>S: replay(deadLetterId, userId)
+        S->>DB: SELECT webhook_dead_letter
+        S->>DB: INSERT webhook_outbox<br/>novo event_id, status pending
+        S->>S: log webhook_replay_requested (replayedBy)
+        S-->>A: 202 Accepted
+    end
+```
+
+**Notas:**
+- O `replayedBy` vem de `req.user.id`, para auditoria.
+- Um segundo replay do mesmo item enquanto há evento pendente originado dele retorna `WEBHOOK_ALREADY_REPLAYED` (409).
+
+### 13.6 Modelo de dados do módulo e payload de saída
+
+Diagrama de classes das entidades e do payload de saída, para quem vai integrar. Mostra a
+relação entre `webhook_endpoint`, `webhook_outbox`, `webhook_delivery` e
+`webhook_dead_letter` e o formato do evento entregue (seções 5.8 e 12).
+
+```mermaid
+classDiagram
+    class WebhookEndpoint {
+        +String id
+        +String customerId
+        +String url
+        +String secret
+        +String previousSecret
+        +DateTime previousSecretValidUntil
+        +Boolean active
+        +Json statusFilter
+    }
+    class WebhookOutbox {
+        +String id
+        +String webhookEndpointId
+        +String orderId
+        +String eventId
+        +Json payload
+        +String status
+        +Int attempts
+        +DateTime nextAttemptAt
+    }
+    class WebhookDelivery {
+        +String id
+        +String outboxId
+        +Int attempt
+        +Int statusCode
+        +Int durationMs
+        +String error
+    }
+    class WebhookDeadLetter {
+        +String id
+        +String outboxId
+        +String webhookEndpointId
+        +Json payload
+        +String lastError
+    }
+    class OrderStatusChangedEvent {
+        +String eventId
+        +String eventType
+        +String timestamp
+        +String orderId
+        +String orderNumber
+        +String fromStatus
+        +String toStatus
+        +String customerId
+        +Int totalCents
+    }
+
+    WebhookEndpoint "1" --> "muitos" WebhookOutbox : gera
+    WebhookOutbox "1" --> "muitos" WebhookDelivery : registra
+    WebhookOutbox "1" --> "0..1" WebhookDeadLetter : falha em
+    WebhookOutbox --> OrderStatusChangedEvent : payload
+```
+
+**Notas:**
+- `id` de `WebhookOutbox` é o mesmo valor de `eventId` e vai no header `X-Event-Id`.
+- `statusFilter` é uma lista de valores do enum `OrderStatus`.
+- `OrderStatusChangedEvent` não inclui os itens do pedido; o cliente consulta `GET /orders/:id` se precisar de detalhe.

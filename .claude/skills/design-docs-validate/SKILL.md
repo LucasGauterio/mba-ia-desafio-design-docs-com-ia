@@ -13,7 +13,7 @@ description: >-
 
 - `docs/_workbench/deliverables-checklist.md` (ou, na falta, `.claude/requirements/deliverables.default.md`).
 - Os artefatos: `docs/PRD.md`, `docs/RFC.md`, `docs/FDD.md`, `docs/adrs/*`,
-  `docs/diagrams/*`, `docs/TRACKER.md`, `README.md`, `CLAUDE.md`.
+  `docs/TRACKER.md`, `README.md`, `CLAUDE.md`.
 - `TRANSCRICAO.md` e o repositório (para validar timestamps e caminhos).
 - `.claude/rules/honor-rejected-scope.md`.
 
@@ -35,19 +35,21 @@ description: >-
 ### RFC
 - Seções: metadados (autor/status/data/revisores), TL;DR, Contexto, Proposta técnica,
   Alternativas consideradas, Questões em aberto, Impacto e riscos, Decisões relacionadas.
-- Revisores incluem os 5 participantes.
+- Revisores incluem todos os participantes da reunião (campo `reviewers` do run-state).
 - ≥ 2 alternativas com "trade-off" / "descartada".
 - ≥ 2 questões em aberto.
 - ≥ 2 links `](adrs/ADR-` (ou caminho relativo equivalente).
 - Tamanho compatível com 2 a 4 páginas (heurística: 250-650 linhas).
 
 ### FDD
-- 12 seções incl. "Integração com o sistema existente".
+- 12 seções incl. "Integração com o sistema existente", mais a seção final "Diagramas".
 - ≥ 4 blocos de endpoint HTTP com exemplo `json` de request e response e status codes.
 - `grep -o 'WEBHOOK_[A-Z_]*'` retorna ≥ 5 códigos distintos; nenhum código de erro do
   módulo sem prefixo `WEBHOOK_`.
 - Seção 12: extrair caminhos `src/...` e `prisma/...`; ≥ 4 distintos; **cada um existe** no repo.
 - "Observabilidade" menciona métrica(s), log(s) e tracing/correlação.
+- Seção "Diagramas" no fim do arquivo: 4 a 10 blocos ```mermaid, sem elemento ausente do
+  corpo; nenhum arquivo `docs/diagrams/` separado.
 
 ### ADRs
 - Cada arquivo tem: `**Status:**`, `## Contexto`, `## Decisão`, `## Alternativas`,
@@ -70,8 +72,8 @@ description: >-
 - ≥ 1 ferramenta de IA; ≥ 2 blocos de código de prompt; ≥ 2 iterações concretas.
 
 ### Prosa limpa (rastreabilidade só no Tracker)
-- `grep -rnE '\[[0-9]{2}:[0-9]{2}\]' docs/PRD.md docs/RFC.md docs/FDD.md docs/adrs/*.md
-  docs/diagrams/*.md` → **zero** ocorrências. Timestamps reais só no `docs/TRACKER.md` e em
+- `grep -rnE '\[[0-9]{2}:[0-9]{2}\]' docs/PRD.md docs/RFC.md docs/FDD.md docs/adrs/*.md`
+  → **zero** ocorrências. Timestamps reais só no `docs/TRACKER.md` e em
   `docs/_workbench/`. O placeholder de formato `[hh:mm]` (com letras) pode aparecer no
   `README.md` e no plano do processo descrevendo a convenção.
 - Nenhum travessão longo (em-dash) em nenhum documento do pacote.

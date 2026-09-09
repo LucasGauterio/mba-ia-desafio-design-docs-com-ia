@@ -9,8 +9,8 @@ o README do processo exigido pelo desafio) e da doc do workflow em
 
 Em vez de escrever cada documento à mão, foi construído um **workflow do Claude Code**
 (`.claude/`) que transforma uma transcrição de reunião mais o código de uma aplicação
-existente em um pacote de design docs rastreável (PRD, RFC, FDD, 5 a 8 ADRs, diagramas,
-Tracker, README do processo). O mesmo workflow serve para transcrições futuras.
+existente em um pacote de design docs rastreável (PRD, RFC, FDD com diagramas embutidos,
+5 a 8 ADRs, Tracker, README do processo). O mesmo workflow serve para transcrições futuras.
 
 **Restrições:** entrega puramente documental (não tocar em `src/`, `prisma/`, `tests/`,
 configs); todo item rastreável à transcrição ou a um arquivo real, com a origem
@@ -32,7 +32,7 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
 | `design-docs-adr` | `docs/adrs/ADR-NNN-*.md` |
 | `design-docs-rfc` | `docs/RFC.md` |
 | `design-docs-fdd` | `docs/FDD.md` |
-| `design-docs-diagrams` | `docs/diagrams/<feature>-diagrams.md` |
+| `design-docs-diagrams` | seção "Diagramas" no fim de `docs/FDD.md` |
 | `design-docs-prd` | `docs/PRD.md` |
 | `design-docs-tracker` | `docs/TRACKER.md` |
 | `design-docs-readme` | `README.md` reescrito |
@@ -115,7 +115,8 @@ e ajustes" do [`README.md`](README.md): revisões do plano; git bloqueado pelo a
 travessão longo (em-dash) violando a regra de estilo; a seção de integração do FDD começou
 genérica; contagens do Tracker feitas de cabeça; `gitleaks` barrando secrets de exemplo com
 entropia alta; citação de fonte inline movida para o Tracker; arquivo de config inventado
-removido em favor da transcrição informada na chamada.
+removido em favor da transcrição informada na chamada; diagramas movidos de um arquivo
+`docs/diagrams/` separado para uma seção embutida no fim do `docs/FDD.md`.
 
 ## Estrutura final da entrega
 
@@ -126,9 +127,8 @@ DESIGN_DOCS_PROCESS.md        # este arquivo
 TRANSCRICAO.md                # transcrição (não alterada)
 README.md                     # README do processo
 docs/
-  PRD.md  RFC.md  FDD.md  TRACKER.md
+  PRD.md  RFC.md  FDD.md  TRACKER.md   # FDD.md tem a seção "Diagramas" ao fim
   adrs/ADR-001..007-*.md  adrs/README.md
-  diagrams/webhooks-diagrams.md
 .claude/
   README.md
   skills/design-docs*/SKILL.md
@@ -149,7 +149,8 @@ docs/
   (`/design-docs @TRANSCRICAO.md`) e ficam no `docs/_workbench/run-state.md`.
 - Workflow self-contained: skills e references próprias para tudo, inclusive ADR e
   diagramas. Plugins de terceiros ficam como alternativa opcional.
-- Diagramas Mermaid gerados por padrão junto do FDD, em `docs/diagrams/`.
+- Diagramas Mermaid embutidos como a última seção do próprio `docs/FDD.md`, não em arquivo
+  separado.
 - RFC ocupa a altura de arquitetura (proposta submetida a revisão), com estrutura
   construída a partir do requisito 2 do enunciado.
 - Ordem de autoria: ADR, RFC, FDD com diagramas, PRD, Tracker, README.

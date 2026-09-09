@@ -17,7 +17,7 @@ Sistema de Webhooks de Notificação de Pedidos (outbound), sobre o OMS existent
 | RFC | `docs/RFC.md` | `design-docs-rfc` |
 | FDD | `docs/FDD.md` | `design-docs-fdd` |
 | ADRs (5 a 8) | `docs/adrs/ADR-NNN-titulo-kebab.md` | `design-docs-adr` |
-| Diagramas | `docs/diagrams/webhooks-diagrams.md` | `design-docs-diagrams` |
+| Diagramas | seção "Diagramas" no fim de `docs/FDD.md` | `design-docs-diagrams` |
 | Tracker | `docs/TRACKER.md` | `design-docs-tracker` |
 | README do processo | `README.md` (substitui o enunciado) | `design-docs-readme` |
 
@@ -59,6 +59,8 @@ Não alterar `src/`, `prisma/`, `tests/`, configs. `TRANSCRICAO.md` não muda.
 - [ ] Matriz de erros usa códigos com prefixo `WEBHOOK_`.
 - [ ] "Integração com o sistema existente": ≥ 4 caminhos de arquivo reais do código base.
 - [ ] "Observabilidade": cita métricas, logs e tracing.
+- [ ] Seção final "Diagramas": 4 a 10 diagramas Mermaid embutidos, cada um apontando a
+      seção que ilustra; sem arquivo `docs/diagrams/` separado.
 
 ### ADRs `docs/adrs/ADR-NNN-*.md`
 - [ ] Pasta contém entre 5 e 8 arquivos no formato `ADR-NNN-titulo-em-kebab-case.md`.

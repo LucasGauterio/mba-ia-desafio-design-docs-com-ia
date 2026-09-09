@@ -1,8 +1,8 @@
 # Workflow `design-docs`
 
 Transforma **uma transcrição de reunião técnica + o código de uma aplicação existente** em
-um pacote de design docs rastreável (PRD, RFC, FDD, 5 a 8 ADRs, diagramas, Tracker, README
-do processo). Todo o conhecimento de referência que o pipeline precisa está em
+um pacote de design docs rastreável (PRD, RFC, FDD com diagramas embutidos, 5 a 8 ADRs,
+Tracker, README do processo). Todo o conhecimento de referência que o pipeline precisa está em
 `.claude/references/`; não há dependência de fontes externas em runtime.
 
 ## Como rodar

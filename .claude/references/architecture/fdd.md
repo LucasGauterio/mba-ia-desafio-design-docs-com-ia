@@ -44,7 +44,7 @@ Passo a passo de cada fluxo fim a fim. Para esta feature, no mínimo:
 - **Processamento pelo worker**: polling, seleção de pendentes, envio HTTP, marcação.
 - **Retry**: o que dispara, progressão do backoff, contador de tentativas.
 - **DLQ**: quando um evento é movido, o que se guarda, como se reprocessa.
-Diagramas Mermaid entram como `docs/diagrams/<feature>-diagrams.md` (ver `diagrams.md`).
+Os diagramas Mermaid destes fluxos ficam na última seção do próprio FDD (ver `diagrams.md`).
 
 ## 5. Contratos públicos
 Para cada endpoint HTTP (mínimo 4): rota + método, semântica de status/headers, exemplo de
@@ -109,11 +109,15 @@ Cobrir no mínimo:
 - `src/config/database.ts` / novo entrypoint: worker abre `PrismaClient` próprio.
 - (e.g.) `src/modules/orders/order.status.ts`, `src/shared/logger/index.ts`,
   `src/middlewares/validate.middleware.ts`, `src/app.ts` (`buildControllers`/`buildApiRouter`).
+
+## 13. Diagramas
+Seção final acrescentada por `design-docs-diagrams` (ver `diagrams.md`): 4 a 6 diagramas
+Mermaid embutidos, cada um apontando a seção que ilustra. Não é um arquivo separado.
 ```
 
 ## Checklist (o FDD só está pronto quando)
 
-- [ ] Todas as 12 seções presentes.
+- [ ] Todas as 12 seções presentes, mais a seção 13 "Diagramas" ao fim.
 - [ ] ≥ 4 endpoints HTTP, cada um com exemplo de request e response e status codes.
 - [ ] Matriz de erros usa exclusivamente códigos `WEBHOOK_*`.
 - [ ] Fluxos cobrem outbox, worker, retry e DLQ.

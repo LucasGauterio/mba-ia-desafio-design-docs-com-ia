@@ -1,12 +1,14 @@
 # Reference · diagramas Mermaid do FDD
 
 Boas práticas de diagramação com Mermaid para o FDD. Diagramas reduzem custo cognitivo.
-Entram como anexo do FDD, não como documento separado.
+Entram como seção do próprio FDD, não como documento separado.
 
 ## Onde e quantos
 
-- Arquivo único: `docs/diagrams/<feature>-diagrams.md` (ex.: `webhooks-diagrams.md`).
-- Todos os diagramas embutidos como blocos ` ```mermaid ` no mesmo arquivo.
+- **Embutidos no FDD**, como a última seção numerada de `docs/FDD.md` (título "Diagramas").
+  Não há arquivo de diagramas separado.
+- Cada diagrama é uma subseção: título, parágrafo descritivo (3 a 5 frases) que aponta a
+  seção do FDD que ele ilustra, bloco ` ```mermaid ` e um bloco **Notas:**.
 - Tipicamente 4 a 6 diagramas. Máximo 10. Cada diagrama tem que passar no teste de
   significância abaixo, senão não entra.
 
@@ -51,28 +53,15 @@ Nunca dois diagramas dizendo a mesma coisa.
 - Sequence usa `->>`, `-->>`, `--x`; flowchart usa `-->`, `-.->`, `-- texto -->`. Não misturar.
 - Sem emojis.
 
-## Estrutura do arquivo
+## Estrutura da seção (dentro de `docs/FDD.md`)
 
 ```markdown
-# Diagramas: [Feature]
+## <N+1>. Diagramas
 
-## Visão Geral
-[2 a 4 frases sobre o objetivo do sistema, baseadas no FDD.]
+[1 a 2 frases: diagramas de apoio às seções anteriores; nenhum introduz elemento novo.]
 
-## Elementos Identificados
-### Fluxos externos
-- ...
-### Processos internos
-- ...
-### Variações de comportamento
-- ...
-### Contratos públicos
-- ...
-
-## Diagramas
-
-### [Título do diagrama 1]
-[Parágrafo de 3 a 5 frases: o que representa, quando usar, por que é relevante.]
+### <N+1>.1 [Título do diagrama 1]
+[Parágrafo de 3 a 5 frases: o que representa, qual seção do FDD ilustra, por que é relevante.]
 
 ```mermaid
 ...
@@ -81,13 +70,15 @@ Nunca dois diagramas dizendo a mesma coisa.
 **Notas:**
 - [ponto explicativo]
 
----
+### <N+1>.2 [Título do diagrama 2]
 [repetir por diagrama]
 ```
 
+`<N>` é o número da última seção numerada que já existe no FDD (hoje, 12).
+
 ## Checklist
 
-- [ ] Um único arquivo `docs/diagrams/<feature>-diagrams.md`.
+- [ ] Seção "Diagramas" no fim do `docs/FDD.md`, numerada na sequência das demais.
 - [ ] 4 a 10 diagramas, cada um passando no teste de significância.
 - [ ] Nenhum elemento inventado (só o que está no FDD).
 - [ ] PT com acentos; termos técnicos em inglês; labels curtos.

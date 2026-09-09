@@ -114,7 +114,7 @@ gerado no baseline:
 
 ## Iterações e ajustes
 
-Foram cerca de 8 ciclos principais. Os momentos concretos de correção:
+Foram cerca de 9 ciclos principais. Os momentos concretos de correção:
 
 1. **O plano do workflow passou por várias revisões antes de qualquer geração.** A primeira
    versão criava uma pasta `scripts/` de shell no repositório e usava um prefixo curto
@@ -164,6 +164,10 @@ Foram cerca de 8 ciclos principais. Os momentos concretos de correção:
    feature, o slug e a lista de revisores, gravando os parâmetros resolvidos em
    `docs/_workbench/run-state.md`.
 
+9. **Os diagramas estavam num arquivo `docs/diagrams/webhooks-diagrams.md` à parte**, o que
+   também não constava da estrutura do `DESAFIO.md`. Foram movidos para uma seção embutida
+   no fim do `docs/FDD.md` ("13. Diagramas"), cada um apontando a seção do FDD que ilustra.
+
 ## Como navegar a entrega
 
 Ordem sugerida de leitura:
@@ -174,11 +178,10 @@ Ordem sugerida de leitura:
    descartadas e questões em aberto.
 4. [`docs/adrs/`](docs/adrs/): as sete decisões arquiteturais, uma por arquivo.
 5. [`docs/FDD.md`](docs/FDD.md): como implementar, com contratos, matriz de erros
-   `WEBHOOK_*`, fluxos e a integração com o código existente.
-6. [`docs/diagrams/webhooks-diagrams.md`](docs/diagrams/webhooks-diagrams.md): seis
-   diagramas Mermaid de apoio ao FDD.
-7. [`docs/TRACKER.md`](docs/TRACKER.md): a rastreabilidade de cada item à transcrição ou
+   `WEBHOOK_*`, fluxos, a integração com o código existente e, na última seção, os seis
+   diagramas Mermaid de apoio.
+6. [`docs/TRACKER.md`](docs/TRACKER.md): a rastreabilidade de cada item à transcrição ou
    ao código.
-8. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md)
+7. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md)
    e [`.claude/README.md`](.claude/README.md): o workflow que produziu tudo isso e como
    rodá-lo em outra transcrição.

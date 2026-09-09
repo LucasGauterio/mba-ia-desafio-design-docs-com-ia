@@ -43,8 +43,8 @@ Argumentos aceitos (`$ARGUMENTS`):
      apresentações iniciais), no formato `Nome (papel)`. Sem inventar participantes.
 5. Gravar tudo no bloco `inputs resolvidos` do `docs/_workbench/run-state.md`.
 
-As skills seguintes (`design-docs-spec`, `-ledger`, `-rfc`, `-diagrams`) leem esses valores
-do `run-state.md`; não há outra fonte de configuração.
+As skills seguintes (`design-docs-spec`, `-ledger`, `-rfc`) leem esses valores do
+`run-state.md`; não há outra fonte de configuração.
 
 ## Retomada (fazer sempre no início)
 
@@ -78,7 +78,7 @@ do `run-state.md`; não há outra fonte de configuração.
 | adr | pendente | `docs/adrs/ADR-*.md` |
 | rfc | pendente | `docs/RFC.md` |
 | fdd | pendente | `docs/FDD.md` |
-| diagrams | pendente | `docs/diagrams/<feature.slug>-diagrams.md` |
+| diagrams | pendente | seção "Diagramas" em `docs/FDD.md` |
 | prd | pendente | `docs/PRD.md` |
 | tracker | pendente | `docs/TRACKER.md` |
 | readme | pendente | `README.md` |
@@ -98,7 +98,8 @@ Para cada estágio ainda `pendente`, marcar `em progresso`, invocar a skill, mar
 4. `adr` → skill **design-docs-adr**
 5. `rfc` → skill **design-docs-rfc**
   : **checkpoint:** ADR + RFC prontos para revisão.
-6. `fdd` → skill **design-docs-fdd** (que aciona **design-docs-diagrams** → estágio `diagrams`)
+6. `fdd` → skill **design-docs-fdd** (que aciona **design-docs-diagrams** → estágio
+   `diagrams`, que acrescenta a seção "Diagramas" ao fim do `docs/FDD.md`)
 7. `prd` → skill **design-docs-prd**
   : **checkpoint:** FDD + PRD prontos para revisão.
 8. `tracker` → skill **design-docs-tracker**
