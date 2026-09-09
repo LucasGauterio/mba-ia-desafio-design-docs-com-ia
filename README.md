@@ -182,6 +182,7 @@ Ordem sugerida de leitura:
    diagramas Mermaid de apoio.
 6. [`docs/TRACKER.md`](docs/TRACKER.md): a rastreabilidade de cada item à transcrição ou
    ao código.
-7. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md), o registro de como o pacote foi
-   produzido, e [`.claude/README.md`](.claude/README.md), a doc do workflow que gerou tudo
-   isso e como rodá-lo em outra transcrição.
+7. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md): o registro de como o pacote foi
+   produzido.
+8. [`.claude/README.md`](.claude/README.md): a doc do workflow que gerou tudo isso e como
+   rodá-lo em outra transcrição.
