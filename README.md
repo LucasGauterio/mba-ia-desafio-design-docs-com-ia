@@ -114,7 +114,7 @@ gerado no baseline:
 
 ## Iterações e ajustes
 
-Foram cerca de 7 ciclos principais. Os momentos concretos de correção:
+Foram cerca de 8 ciclos principais. Os momentos concretos de correção:
 
 1. **O plano do workflow passou por várias revisões antes de qualquer geração.** A primeira
    versão criava uma pasta `scripts/` de shell no repositório e usava um prefixo curto
@@ -157,6 +157,12 @@ Foram cerca de 7 ciclos principais. Os momentos concretos de correção:
    Tracker. Junto, a convenção de worktrees mudou para dentro do projeto (`.worktrees/`,
    gitignored) e a pasta `docs/process/` (que o `DESAFIO.md` não previa) foi movida para
    `DESIGN_DOCS_PROCESS.md` na raiz.
+
+8. **O workflow tinha um arquivo de configuração (`.claude/design-docs.config.json`) que
+   o `DESAFIO.md` não previa.** Foi removido. O orquestrador passou a receber a transcrição
+   diretamente na chamada (`/design-docs @TRANSCRICAO.md`) e a derivar dela o nome da
+   feature, o slug e a lista de revisores, gravando os parâmetros resolvidos em
+   `docs/_workbench/run-state.md`.
 
 ## Como navegar a entrega
 

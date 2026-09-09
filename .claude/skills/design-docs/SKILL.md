@@ -5,19 +5,53 @@ description: >-
   aplicação, análise da spec e da transcrição, ADRs, RFC, FDD (+ diagramas), PRD,
   Tracker e README do processo: na ordem do enunciado, parando para validar
   entre blocos. É RETOMÁVEL: lê docs/_workbench/run-state.md e continua do
-  primeiro estágio não concluído. Use /design-docs para rodar ou retomar;
-  /design-docs --restart para recomeçar do zero.
+  primeiro estágio não concluído. Use /design-docs @TRANSCRICAO.md para começar;
+  /design-docs (sem argumento) para retomar; /design-docs --restart para recomeçar.
 ---
 
 # design-docs: pipeline completo
 
+## Entrada
+
+A transcrição é informada **na chamada da skill**, como documento referenciado:
+`/design-docs @TRANSCRICAO.md`. Não existe arquivo de config: os parâmetros da run são
+derivados desse documento e gravados em `docs/_workbench/run-state.md`.
+
+Argumentos aceitos (`$ARGUMENTS`):
+
+- **1º argumento** (obrigatório numa run nova): o documento da transcrição da reunião
+  (`@arquivo.md` ou caminho). Vira o input `transcript`.
+- **2º argumento** (opcional): caminho da spec/enunciado. Se omitido, usar `DESAFIO.md`
+  quando existir na raiz; se não existir, seguir só com
+  `.claude/requirements/deliverables.default.md` e marcar `spec: (nenhuma)`.
+- **`--restart`**: ignora o run-state atual e recomeça do zero.
+- Sem nenhum argumento: retomar a run em andamento.
+
+## Resolução dos inputs (fazer no início de uma run nova)
+
+1. `transcript` = o documento passado no 1º argumento. Abortar com mensagem clara se uma
+   run nova for iniciada sem ele.
+2. `spec` = 2º argumento, senão `DESAFIO.md` se existir, senão `(nenhuma)`.
+3. `outputDir` = `docs` (fixo).
+4. Ler a transcrição e derivar:
+   - `feature.name`: do título/cabeçalho da transcrição (ex.: linha "Reunião: Sistema de
+     Webhooks de Notificação de Pedidos" → `Sistema de Webhooks de Notificação de Pedidos`).
+     Se não houver título explícito, inferir do assunto declarado nas primeiras falas e
+     marcar `(inferido)`.
+   - `feature.slug`: kebab-case curto do nome (ex.: `webhooks`). 1 a 2 palavras.
+   - `reviewers`: a lista de participantes da transcrição (seção "Participantes" ou as
+     apresentações iniciais), no formato `Nome (papel)`. Sem inventar participantes.
+5. Gravar tudo no bloco `inputs resolvidos` do `docs/_workbench/run-state.md`.
+
+As skills seguintes (`design-docs-spec`, `-ledger`, `-rfc`, `-diagrams`) leem esses valores
+do `run-state.md`; não há outra fonte de configuração.
+
 ## Retomada (fazer sempre no início)
 
-1. Ler `.claude/design-docs.config.json`.
-2. Se `docs/_workbench/run-state.md` existe e não veio `--restart`: retomar do primeiro
-   estágio com status ≠ `concluído`.
-3. Se não existe (ou `--restart`): criar `docs/_workbench/run-state.md` a partir do
-   template abaixo, todos os estágios `pendente`.
+1. Se `docs/_workbench/run-state.md` existe e não veio `--restart`: retomar do primeiro
+   estágio com status ≠ `concluído` (os inputs já estão resolvidos no arquivo).
+2. Se não existe (ou `--restart`): resolver os inputs (acima) e criar
+   `docs/_workbench/run-state.md` a partir do template abaixo, todos os estágios `pendente`.
 
 ### Template `docs/_workbench/run-state.md`
 
@@ -25,9 +59,16 @@ description: >-
 # Estado da execução do workflow design-docs
 
 - **run id:** <timestamp>
-- **inputs:** spec=<spec> transcript=<transcript> outputDir=<outputDir>
+- **inputs resolvidos:**
+  - transcript: <caminho do documento passado na chamada>
+  - spec: <2º argumento | DESAFIO.md | (nenhuma)>
+  - outputDir: docs
+  - feature.name: <derivado do título da transcrição>
+  - feature.slug: <kebab-case curto>
+  - reviewers: <Nome (papel), ... : participantes da transcrição>
 - **iteração:** 1
-- **último score de validação:**:- **próxima ação:** rodar estágio `baseline`
+- **último score de validação:** (ainda não rodou)
+- **próxima ação:** rodar estágio `baseline`
 
 | Estágio | Status | Saída |
 |---|---|---|
@@ -37,7 +78,7 @@ description: >-
 | adr | pendente | `docs/adrs/ADR-*.md` |
 | rfc | pendente | `docs/RFC.md` |
 | fdd | pendente | `docs/FDD.md` |
-| diagrams | pendente | `docs/diagrams/webhooks-diagrams.md` |
+| diagrams | pendente | `docs/diagrams/<feature.slug>-diagrams.md` |
 | prd | pendente | `docs/PRD.md` |
 | tracker | pendente | `docs/TRACKER.md` |
 | readme | pendente | `README.md` |

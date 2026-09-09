@@ -2,8 +2,8 @@
 name: design-docs-spec
 description: >-
   Segundo passo do workflow design-docs. Lê a especificação do desafio/entrega
-  (DESAFIO.md por padrão, ou o caminho em .claude/design-docs.config.json) e o
-  perfil .claude/requirements/deliverables.default.md, e emite
+  (o campo spec resolvido em docs/_workbench/run-state.md, DESAFIO.md por padrão)
+  e o perfil .claude/requirements/deliverables.default.md, e emite
   docs/_workbench/deliverables-checklist.md: a lista de artefatos + todos os
   critérios de aceite como checklist verificável. Roda depois de design-docs-baseline.
 ---
@@ -17,9 +17,12 @@ guiar as skills de autoria e a validação final.
 
 ## Insumos
 
-- `.claude/design-docs.config.json` → campo `spec` (default `DESAFIO.md`).
+- `docs/_workbench/run-state.md` → bloco `inputs resolvidos`, campo `spec` (o orquestrador
+  já resolveu: 2º argumento da chamada, senão `DESAFIO.md`, senão `(nenhuma)`). Se a skill
+  for chamada isolada e não houver run-state, usar `DESAFIO.md` quando existir.
 - `.claude/requirements/deliverables.default.md` (perfil já destilado do enunciado).
-- Se a spec informada **difere** do desafio padrão, releia a spec e ajuste o perfil.
+- Se `spec` for `(nenhuma)`, trabalhar só com o perfil. Se a spec informada **difere** do
+  desafio padrão, releia a spec e ajuste o perfil.
 
 ## Passos
 

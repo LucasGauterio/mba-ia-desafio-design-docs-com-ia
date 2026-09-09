@@ -14,7 +14,8 @@ description: >-
 - `docs/FDD.md` (fonte única; não inventar elementos fora dele).
 - `.claude/references/architecture/diagrams.md` (tipos, guardrails de sintaxe, lista dos
   diagramas esperados).
-- `.claude/design-docs.config.json` → `feature.slug`.
+- `docs/_workbench/run-state.md` → `inputs resolvidos` → `feature.slug` (nomeia o arquivo
+  de saída). Sem run-state, derivar um slug curto do título do FDD.
 
 ## Passos
 
@@ -32,7 +33,8 @@ description: >-
 
 ## Saída
 
-`docs/diagrams/webhooks-diagrams.md` (slug de `.claude/design-docs.config.json`).
+`docs/diagrams/<feature.slug>-diagrams.md` (slug do run-state; para o desafio dos webhooks,
+`docs/diagrams/webhooks-diagrams.md`).
 
 ## Checklist antes de concluir
 

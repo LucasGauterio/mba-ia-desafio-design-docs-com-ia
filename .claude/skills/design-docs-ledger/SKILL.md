@@ -19,7 +19,9 @@ entra é tão importante quanto o que entra.
 
 ## Insumos
 
-- `.claude/design-docs.config.json` → `transcript` (default `TRANSCRICAO.md`).
+- `docs/_workbench/run-state.md` → `inputs resolvidos` → `transcript` (o documento que o
+  usuário passou em `/design-docs @arquivo.md`). Se a skill for chamada isolada, aceitar o
+  caminho como argumento; sem nada, cair em `TRANSCRICAO.md`.
 - `.claude/references/codebase/*` (para reconhecer os ganchos com o código).
 - `.claude/rules/honor-rejected-scope.md`.
 
@@ -51,8 +53,8 @@ Perguntas dirigidas por bucket:
 ```markdown
 # Ledger da transcrição
 
-Fonte: <transcript>: reunião de ~55 min, 5 participantes
-(Larissa/Tech Lead, Marcos/PM, Bruno/Eng., Diego/Eng. Sênior, Sofia/Segurança)
+Fonte: <transcript>: reunião de ~<duração>, participantes: <Nome (papel), ...>
+(os mesmos do campo `reviewers` do run-state)
 
 ## Decisões fechadas
 | # | Decisão | Alternativa descartada | Origem |

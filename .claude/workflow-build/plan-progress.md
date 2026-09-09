@@ -20,8 +20,10 @@
       `no-cross-document-duplication`, `honor-rejected-scope` + wiring no `CLAUDE.md`.
 - [x] 4. Análise de inputs: `design-docs-spec`, `design-docs-ledger`.
 - [x] 5. Autoria: `design-docs-adr`, `-rfc`, `-fdd`, `-diagrams`, `-prd`, `-tracker`,
-      `-readme`; orquestrador `design-docs` retomável via `docs/_workbench/run-state.md`;
-      `design-docs.config.json`.
+      `-readme`; orquestrador `design-docs` retomável via `docs/_workbench/run-state.md`.
+      Inputs (transcrição, spec, feature, revisores) derivados do documento passado na
+      chamada (`/design-docs @TRANSCRICAO.md`) e gravados no `run-state.md`: sem arquivo de
+      config.
 - [x] 6. Validação: `design-docs-validate` com checagens mecânicas por documento.
 - [x] 7. Teste em worktree `.worktrees/design-docs-run-<timestamp>` a partir de `dev`:
       pipeline completo, validação 36 de 36.
@@ -41,5 +43,8 @@
    rastreabilidade só no `docs/TRACKER.md`, os 4 tipos de documento regerados.
 6. `docs/process/` (que o `DESAFIO.md` não previa) movido para `DESIGN_DOCS_PROCESS.md` na
    raiz. Worktrees passaram a ficar dentro do projeto, em `.worktrees/` (gitignored).
+7. `.claude/design-docs.config.json` (inventado, não previsto pelo `DESAFIO.md`) removido.
+   O orquestrador passou a derivar os parâmetros da transcrição informada na própria
+   chamada (`/design-docs @TRANSCRICAO.md`).
 
 Detalhe completo na seção "Iterações e ajustes" do `README.md`.

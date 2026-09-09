@@ -14,12 +14,15 @@ description: >-
 - `docs/_workbench/transcript-ledger.md` → "Descartados" (viram alternativas) e
   "Adiados / futuro" (viram questões em aberto).
 - `.claude/references/architecture/rfc.md` (esqueleto e checklist).
-- `.claude/design-docs.config.json` → `reviewers`, `feature`.
+- `docs/_workbench/run-state.md` → `inputs resolvidos` → `reviewers` e `feature.name`
+  (derivados da transcrição pelo orquestrador). Sem run-state, tirar os revisores da seção
+  de participantes da própria transcrição.
 - `.claude/rules/*`.
 
 ## Passos
 
-1. Metadados: autor, status "Em revisão", data, revisores = os 5 participantes da reunião.
+1. Metadados: autor, status "Em revisão", data, revisores = os participantes da reunião
+   (`reviewers` do run-state).
 2. TL;DR de 3 a 6 linhas.
 3. Contexto e problema: por que agora, o que existe hoje, restrições reais. Sem repetir o PRD.
 4. Proposta técnica: visão de arquitetura (outbox + worker separado + assinatura HMAC +
@@ -40,7 +43,7 @@ description: >-
 
 ## Checklist antes de concluir
 
-- [ ] Metadados com os 5 revisores.
+- [ ] Metadados com os revisores (todos os participantes da reunião).
 - [ ] TL;DR, contexto, proposta, alternativas, questões em aberto, impacto/riscos, decisões
       relacionadas.
 - [ ] ≥ 2 alternativas descartadas, cada uma com o trade-off que motivou o descarte.

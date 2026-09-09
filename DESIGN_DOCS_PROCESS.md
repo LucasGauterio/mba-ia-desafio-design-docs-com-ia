@@ -54,10 +54,21 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
 - `guidelines/ai-as-maestro.md`.
 - `references/INDEX.md` (índice do que cada reference cobre).
 
-### Config
+### Entrada da run (sem arquivo de config)
 
-`.claude/design-docs.config.json`: `spec`, `transcript`, `outputDir`, `feature`,
-`reviewers`. Trocar para rodar em outra transcrição ou aplicação.
+Não há arquivo de configuração. A transcrição é informada na própria chamada:
+`/design-docs @TRANSCRICAO.md`. O orquestrador resolve os parâmetros e os grava no bloco
+`inputs resolvidos` de `docs/_workbench/run-state.md`:
+
+- `transcript`: o documento passado na chamada.
+- `spec`: 2º argumento, senão `DESAFIO.md` se existir, senão `(nenhuma)` (só o perfil
+  `.claude/requirements/deliverables.default.md`).
+- `outputDir`: `docs` (fixo).
+- `feature.name` / `feature.slug`: derivados do título da transcrição.
+- `reviewers`: a lista de participantes da transcrição.
+
+Para rodar em outra transcrição ou aplicação, basta chamar `/design-docs` apontando o novo
+documento.
 
 ## Fases da construção
 
@@ -103,7 +114,8 @@ validação: **36 de 36 critérios** (os 34 de aceite do `DESAFIO.md` mais "pros
 e ajustes" do [`README.md`](README.md): revisões do plano; git bloqueado pelo ambiente;
 travessão longo (em-dash) violando a regra de estilo; a seção de integração do FDD começou
 genérica; contagens do Tracker feitas de cabeça; `gitleaks` barrando secrets de exemplo com
-entropia alta; citação de fonte inline movida para o Tracker.
+entropia alta; citação de fonte inline movida para o Tracker; arquivo de config inventado
+removido em favor da transcrição informada na chamada.
 
 ## Estrutura final da entrega
 
@@ -118,7 +130,7 @@ docs/
   adrs/ADR-001..007-*.md  adrs/README.md
   diagrams/webhooks-diagrams.md
 .claude/
-  design-docs.config.json  README.md
+  README.md
   skills/design-docs*/SKILL.md
   commands/design-docs*.md
   rules/*.md  requirements/*.md  guidelines/*.md
@@ -133,6 +145,8 @@ docs/
 
 - Workflow chamado `design-docs`; skills e commands com o nome por extenso; o nome é igual
   ao resultado da execução.
+- Sem arquivo de config: os parâmetros da run saem da transcrição informada na chamada
+  (`/design-docs @TRANSCRICAO.md`) e ficam no `docs/_workbench/run-state.md`.
 - Workflow self-contained: skills e references próprias para tudo, inclusive ADR e
   diagramas. Plugins de terceiros ficam como alternativa opcional.
 - Diagramas Mermaid gerados por padrão junto do FDD, em `docs/diagrams/`.

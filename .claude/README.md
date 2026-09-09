@@ -7,11 +7,14 @@ do processo). Todo o conhecimento de referência que o pipeline precisa está em
 
 ## Como rodar
 
-1. Ajuste `.claude/design-docs.config.json` (`spec`, `transcript`, `outputDir`, `feature`,
-   `reviewers`).
-2. `/design-docs`: roda o pipeline completo, ou retoma de onde parou.
-   - `/design-docs --restart` recomeça do zero.
-3. Comandos por etapa, para iterar isolado:
+1. `/design-docs @TRANSCRICAO.md`: começa uma run nova. O orquestrador lê a transcrição
+   informada, deriva o nome da feature, o slug e a lista de revisores dela, resolve a spec
+   (2º argumento, senão `DESAFIO.md` se existir) e grava tudo em
+   `docs/_workbench/run-state.md`. Não há arquivo de config.
+2. `/design-docs` (sem argumento): retoma de `docs/_workbench/run-state.md`, do primeiro
+   estágio não concluído.
+   - `/design-docs @TRANSCRICAO.md --restart` recomeça do zero.
+3. Comandos por etapa, para iterar isolado (leem os inputs do `run-state.md`):
    `/design-docs-baseline`, `/design-docs-spec`, `/design-docs-ledger`, `/design-docs-adr`,
    `/design-docs-rfc`, `/design-docs-fdd`, `/design-docs-diagrams`, `/design-docs-prd`,
    `/design-docs-tracker`, `/design-docs-readme`, `/design-docs-validate`.
@@ -58,7 +61,7 @@ gitignored (nunca versionado).
 RUN=$(date +%Y%m%d-%H%M%S)
 git worktree add -b design-docs/$RUN .worktrees/design-docs-run-$RUN dev
 cd .worktrees/design-docs-run-$RUN
-claude -p "/design-docs" --permission-mode acceptEdits --output-format stream-json | tee run.log
+claude -p "/design-docs @TRANSCRICAO.md" --permission-mode acceptEdits --output-format stream-json | tee run.log
 claude -p "/design-docs-validate" --permission-mode acceptEdits | tee validation.md
 # ler validation.md; se houver falhas, corrigir os assets em dev e refazer a run
 cd ../.. && git worktree remove .worktrees/design-docs-run-$RUN     # ao terminar
