@@ -12,25 +12,23 @@ podem se passar de 2 segundos a ~15 horas (ADR-002, ADR-003). Nesse intervalo, o
 pode sofrer outras mudanças.
 
 A questão era se a linha da outbox guarda o **payload já renderizado** ou apenas o
-`order_id`, deixando o worker montar o payload no momento do envio ([09:51] Bruno).
+`order_id`, deixando o worker montar o payload no momento do envio.
 
 ## Decisão
 
 A outbox guarda o **payload renderizado no momento da inserção** (snapshot). O evento
-reflete o estado do pedido **quando aquele status mudou**, não o estado no momento do envio
-([09:52] Larissa / Diego / Bruno).
+reflete o estado do pedido **quando aquele status mudou**, não o estado no momento do envio.
 
 O payload é um JSON com `event_id`, `event_type` (`"order.status_changed"`), `timestamp`
 ISO 8601, `order_id`, `order_number`, `from_status`, `to_status`, `customer_id` e campos
 básicos do pedido como `total_cents`. Os itens do pedido não vão no payload, para não
-inflá-lo; o cliente que quiser detalhes consulta `GET /orders/:id` ([09:43] Diego).
+inflá-lo; o cliente que quiser detalhes consulta `GET /orders/:id`.
 
 ## Alternativas consideradas
 
 - **Guardar só `order_id` e renderizar o payload no momento do envio.** Descartada: se o
   pedido mudar de estado entre a inserção e o envio, o evento entregaria um estado
-  diferente do que disparou a notificação, gerando casos confusos para o cliente ([09:52]
-  Larissa).
+  diferente do que disparou a notificação, gerando casos confusos para o cliente.
 
 ## Consequências
 

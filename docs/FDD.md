@@ -6,16 +6,16 @@ Responsável: Time de Plataforma / Pedidos
 
 Documento de implementação. As decisões estão fechadas nos ADRs
 ([ADR-001](adrs/ADR-001-outbox-no-mysql.md) a
-[ADR-007](adrs/ADR-007-snapshot-do-payload-na-insercao.md)); a proposta de arquitetura
-está no [RFC](RFC.md). Este FDD não reabre decisões nem repete a justificativa de produto
-do [PRD](PRD.md).
+[ADR-007](adrs/ADR-007-snapshot-do-payload-na-insercao.md)); a proposta de arquitetura está
+no [RFC](RFC.md). Este FDD não reabre decisões nem repete a justificativa de produto do
+[PRD](PRD.md). A origem de cada afirmação está no [TRACKER](TRACKER.md).
 
 ---
 
 ## 1. Contexto e motivação técnica
 
 Os clientes B2B precisam saber quando o status de um pedido muda sem fazer polling no
-`GET /orders` ([09:00] Marcos). O status só muda em `OrderService.changeStatus`
+`GET /orders`. O status só muda em `OrderService.changeStatus`
 (`src/modules/orders/order.service.ts`), dentro de uma `prisma.$transaction` que já
 atualiza `orders`, insere em `order_status_history` e ajusta o estoque.
 
@@ -26,19 +26,19 @@ Atores: o **usuário autenticado** que gerencia a configuração de webhook pela
 **worker** que entrega; o **endpoint HTTP do cliente** que recebe; o **administrador** que
 faz replay de DLQ.
 
-Limites: só webhooks **outbound** (a plataforma envia, o cliente recebe) ([09:03] Sofia).
-Só o evento `order.status_changed`.
+Limites: só webhooks **outbound** (a plataforma envia, o cliente recebe). Só o evento
+`order.status_changed`.
 
 ## 2. Objetivos técnicos
 
 - Se a transação de `changeStatus` commitou, o evento **foi registrado** na outbox; se deu
-  rollback, o evento não existe ([09:41] Diego).
+  rollback, o evento não existe.
 - Entrega em menos de 10 segundos no caminho feliz; o pior caso da fila é 2 segundos de
-  polling mais o tempo de envio ([09:02] Marcos; [09:10] Larissa).
+  polling mais o tempo de envio.
 - Garantia **at-least-once**: um evento pode ser entregue mais de uma vez; nunca zero vez
-  se foi registrado ([09:24] Diego).
+  se foi registrado.
 - Toda requisição de saída assinada com HMAC-SHA256 e identificável por `X-Event-Id`.
-- Ordenação por `order_id` preservada enquanto houver um único worker ([09:12] Diego).
+- Ordenação por `order_id` preservada enquanto houver um único worker.
 - Zero alteração nos contratos HTTP existentes de pedidos, clientes e produtos.
 
 ## 3. Escopo e exclusões
@@ -46,19 +46,19 @@ Só o evento `order.status_changed`.
 **Incluído**
 
 - Modelos `webhook_endpoint`, `webhook_outbox`, `webhook_delivery`, `webhook_dead_letter`.
-- CRUD de configuração de webhook + rotação de secret + histórico de entregas (API HTTP).
+- CRUD de configuração de webhook mais rotação de secret mais histórico de entregas (API HTTP).
 - Função `publishWebhookEvent(tx, order, fromStatus, toStatus)` chamada em `changeStatus`.
 - Filtro de status de interesse aplicado na inserção da outbox.
-- Worker de entrega (`src/worker.ts` + `npm run worker`) com polling, retry, backoff e DLQ.
+- Worker de entrega (`src/worker.ts` mais `npm run worker`) com polling, retry, backoff e DLQ.
 - Endpoint administrativo de replay de DLQ.
 
 **Excluído** (ver `.claude/rules/honor-rejected-scope.md` e a seção "Fora de escopo" do PRD)
 
-- E-mail ou qualquer alerta ao cliente quando o webhook falha ([09:37] Larissa).
-- Dashboard ou painel visual ([09:39] Marcos).
-- Arquivamento de linhas entregues da outbox ([09:08] Diego).
-- Rate limiting de saída (questão em aberto no RFC) ([09:39] Larissa).
-- Escalar para múltiplos workers ([09:13] Diego).
+- E-mail ou qualquer alerta ao cliente quando o webhook falha.
+- Dashboard ou painel visual.
+- Arquivamento de linhas entregues da outbox.
+- Rate limiting de saída (questão em aberto no RFC).
+- Escalar para múltiplos workers.
 - Webhook inbound.
 
 ## 4. Fluxos detalhados
@@ -71,26 +71,25 @@ Só o evento `order.status_changed`.
 3. Ainda **dentro do mesmo `tx`**, `changeStatus` chama
    `publishWebhookEvent(tx, order, fromStatus, toStatus)`.
 4. `publishWebhookEvent` consulta os `webhook_endpoint` ativos do `order.customerId` cujo
-   `status_filter` contém `toStatus`. Se não houver nenhum, retorna sem escrever nada
-   ([09:34] Bruno).
+   `status_filter` contém `toStatus`. Se não houver nenhum, retorna sem escrever nada.
 5. Se houver ao menos um, renderiza o payload do evento uma vez (snapshot, ver
    [ADR-007](adrs/ADR-007-snapshot-do-payload-na-insercao.md)) e insere **uma linha em
    `webhook_outbox` por endpoint alvo**, com `status = pending`, `attempts = 0`,
    `next_attempt_at = now()`, `id` UUID (que também é o `event_id`).
 6. Se a inserção falhar (por exemplo, payload acima de 64 KB, ver §6), `publishWebhookEvent`
-   lança um erro e a transação inteira sofre rollback ([09:40] Bruno).
+   lança um erro e a transação inteira sofre rollback.
 7. Commit. O status mudou e os eventos estão registrados, ou nada aconteceu.
 
 ### 4.2 Processamento pelo worker
 
-1. O worker (`src/worker.ts`) roda um loop. A cada **2 segundos** ([09:09] Diego):
+1. O worker (`src/worker.ts`) roda um loop. A cada **2 segundos**:
 2. Seleciona em lote pequeno os eventos com `status = pending` e `next_attempt_at <= now()`,
    ordenados por `created_at` ascendente (garante ordem por `order_id` com worker único).
 3. Para cada evento: marca `status = processing`, resolve a secret vigente do
    `webhook_endpoint` (a atual e, se dentro do grace period, a anterior), calcula
    `X-Signature = HMAC-SHA256(payload, secret_atual)`.
-4. Faz `POST` para a `url` do endpoint com timeout de **10 segundos** ([09:42] Diego),
-   headers de §5.4, corpo = payload snapshot.
+4. Faz `POST` para a `url` do endpoint com timeout de **10 segundos**, headers de §5.8,
+   corpo igual ao payload snapshot.
 5. Grava uma linha em `webhook_delivery` com `outbox_id`, `attempt`, `status_code`,
    `response_body` (truncado), `duration_ms`, `error` (se houver).
 6. **2xx**: marca o evento `status = delivered`, `delivered_at = now()`.
@@ -101,22 +100,21 @@ Só o evento `order.status_changed`.
 1. Falha no envio: `attempts = attempts + 1`.
 2. Se `attempts < 5`: `status = pending`,
    `next_attempt_at = now() + backoff[attempts]`, onde
-   `backoff = [1min, 5min, 30min, 2h, 12h]` ([09:17] Diego). O worker vai retentar quando a
-   janela chegar.
+   `backoff = [1min, 5min, 30min, 2h, 12h]`. O worker vai retentar quando a janela chegar.
 3. Se `attempts >= 5`: vai para §4.4 (DLQ).
 
 ### 4.4 Dead letter queue
 
 1. Esgotadas as 5 tentativas, o worker insere uma linha em `webhook_dead_letter` com
    `outbox_id`, `webhook_endpoint_id`, `payload` (o snapshot), `last_error`,
-   `failed_at = now()` ([09:18] Diego).
+   `failed_at = now()`.
 2. O evento na `webhook_outbox` é marcado `status = dead_letter` (fica na tabela como
    histórico, mas o worker não o seleciona mais).
 3. **Replay:** um administrador chama
    `POST /api/v1/admin/webhooks/dead-letter/:id/replay`. O serviço cria um **novo** evento
    em `webhook_outbox` com o mesmo payload, `status = pending`, `attempts = 0`,
-   `next_attempt_at = now()`, e um **novo** `id`/`event_id` ([09:18] Diego). Registra em log
-   quem executou o replay ([09:36] Sofia).
+   `next_attempt_at = now()`, e um **novo** `id`/`event_id`. Registra em log quem executou o
+   replay.
 
 ## 5. Contratos públicos
 
@@ -128,8 +126,8 @@ Formato de erro: `{ "error": { "code", "message", "details"? } }` (padrão do
 ### 5.1 `POST /api/v1/webhooks`: cadastrar endpoint de webhook
 
 Auth: usuário autenticado. Status: `201`, `400` (`WEBHOOK_INVALID_URL`,
-`WEBHOOK_EMPTY_STATUS_FILTER`, `VALIDATION_ERROR`), `404`/`422`
-(`WEBHOOK_CUSTOMER_NOT_FOUND`), `409` (`WEBHOOK_DUPLICATE_URL`).
+`WEBHOOK_EMPTY_STATUS_FILTER`, `VALIDATION_ERROR`), `422` (`WEBHOOK_CUSTOMER_NOT_FOUND`),
+`409` (`WEBHOOK_DUPLICATE_URL`).
 
 Request:
 ```json
@@ -154,13 +152,12 @@ Response `201`:
 }
 ```
 
-A `secret` só aparece nesta resposta e na resposta de rotação; não é retornada em `GET`
-([09:31] Marcos).
+A `secret` só aparece nesta resposta e na resposta de rotação; não é retornada em `GET`.
 
 ### 5.2 `GET /api/v1/webhooks?customerId=<uuid>`: listar endpoints de um customer
 
-Auth: usuário autenticado. Status: `200`, `400` (`VALIDATION_ERROR` se `customerId`
-ausente ou inválido).
+Auth: usuário autenticado. Status: `200`, `400` (`VALIDATION_ERROR` se `customerId` ausente
+ou inválido).
 
 Response `200` (formato `paginated`, `src/shared/http/response.ts`):
 ```json
@@ -213,12 +210,12 @@ Response `200`:
 ```
 
 A secret anterior continua válida para verificação por 24 horas
-([09:21] Sofia; [ADR-004](adrs/ADR-004-assinatura-hmac-sha256-secret-por-endpoint.md)).
+([ADR-004](adrs/ADR-004-assinatura-hmac-sha256-secret-por-endpoint.md)).
 
 ### 5.6 `GET /api/v1/webhooks/:id/deliveries`: histórico de entregas
 
 Auth: usuário autenticado. Status: `200`, `404` (`WEBHOOK_NOT_FOUND`). Retorna os últimos
-envios (default 100, `pageSize` máx. 100) ([09:34] Marcos).
+envios (default 100, `pageSize` máx. 100).
 
 Response `200`:
 ```json
@@ -255,9 +252,9 @@ Response `200`:
 
 ### 5.7 `POST /api/v1/admin/webhooks/dead-letter/:id/replay`: reprocessar item da DLQ
 
-Auth: usuário autenticado **com role `ADMIN`** ([09:36] Sofia). Status: `202`, `403`
-(`FORBIDDEN`, role insuficiente), `404` (`WEBHOOK_DEAD_LETTER_NOT_FOUND`), `409`
-(`WEBHOOK_ALREADY_REPLAYED` se já houver um replay pendente para o mesmo item).
+Auth: usuário autenticado **com role `ADMIN`**. Status: `202`, `403` (`FORBIDDEN`, role
+insuficiente), `404` (`WEBHOOK_DEAD_LETTER_NOT_FOUND`), `409` (`WEBHOOK_ALREADY_REPLAYED`
+se já houver um replay pendente para o mesmo item).
 
 Request: corpo vazio.
 
@@ -280,13 +277,13 @@ Headers:
 
 | Header | Valor | Semântica |
 |---|---|---|
-| `Content-Type` | `application/json` | corpo JSON ([09:44] Diego) |
-| `X-Event-Id` | UUID do evento | único por evento; o cliente **deve** deduplicar por ele ([09:25] Diego) |
-| `X-Webhook-Id` | UUID do `webhook_endpoint` | identifica qual cadastro gerou o envio, para clientes com vários ([09:44] Sofia) |
-| `X-Signature` | `sha256=<hex>` | HMAC-SHA256 do corpo bruto com a secret do endpoint ([09:20] Sofia) |
-| `X-Timestamp` | ISO 8601 do momento do envio | permite ao cliente detectar replay attack ([09:44] Diego) |
+| `Content-Type` | `application/json` | corpo JSON |
+| `X-Event-Id` | UUID do evento | único por evento; o cliente **deve** deduplicar por ele |
+| `X-Webhook-Id` | UUID do `webhook_endpoint` | identifica qual cadastro gerou o envio, para clientes com vários |
+| `X-Signature` | `sha256=<hex>` | HMAC-SHA256 do corpo bruto com a secret do endpoint |
+| `X-Timestamp` | ISO 8601 do momento do envio | permite ao cliente detectar replay attack |
 
-Corpo (payload snapshot, sem os itens do pedido, [09:43] Diego):
+Corpo (payload snapshot, sem os itens do pedido):
 ```json
 {
   "eventId": "d4c9a1f2-4444-4d5e-af60-000000000004",
@@ -306,15 +303,15 @@ qualquer outra coisa conta como falha.
 
 ## 6. Matriz de erros previstos
 
-Todos os códigos do módulo usam o prefixo `WEBHOOK_` ([09:29] Larissa) e herdam de
-`AppError` (`src/shared/errors/app-error.ts`).
+Todos os códigos do módulo usam o prefixo `WEBHOOK_` e herdam de `AppError`
+(`src/shared/errors/app-error.ts`).
 
 ### 6.1 Erros da API HTTP
 
 | Código | HTTP | Condição | Tratamento |
 |---|---|---|---|
 | `WEBHOOK_NOT_FOUND` | 404 | `:id` de webhook inexistente | resposta de erro padrão |
-| `WEBHOOK_INVALID_URL` | 400 | `url` não começa com `https://` | rejeitado no schema Zod ([09:23] Sofia) |
+| `WEBHOOK_INVALID_URL` | 400 | `url` não começa com `https://` | rejeitado no schema Zod |
 | `WEBHOOK_EMPTY_STATUS_FILTER` | 400 | `statusFilter` vazio | rejeitado no schema Zod |
 | `WEBHOOK_INVALID_STATUS_FILTER` | 400 | valor fora do enum `OrderStatus` | rejeitado no schema Zod contra `src/modules/orders/order.status.ts` |
 | `WEBHOOK_CUSTOMER_NOT_FOUND` | 422 | `customerId` não existe em `customers` | `UnprocessableEntityError` no service |
@@ -325,23 +322,23 @@ Todos os códigos do módulo usam o prefixo `WEBHOOK_` ([09:29] Larissa) e herda
 | `WEBHOOK_ALREADY_REPLAYED` | 409 | replay pedido para item que já tem evento pendente originado de replay | `ConflictError` no service |
 | `FORBIDDEN` | 403 | replay chamado por usuário sem role `ADMIN` | tratado por `requireRole('ADMIN')` (erro já existente) |
 
-### 6.2 Erros de processamento no worker (não são respostas HTTP; viram estado + log + métrica)
+### 6.2 Erros de processamento no worker (não são respostas HTTP; viram estado mais log mais métrica)
 
 | Código | Condição | Tratamento |
 |---|---|---|
 | `WEBHOOK_DELIVERY_TIMEOUT` | cliente não respondeu em 10 s | conta como falha; `attempts++`; retry ou DLQ (§4.3, §4.4) |
 | `WEBHOOK_DELIVERY_HTTP_ERROR` | resposta não 2xx | idem; `status_code` registrado em `webhook_delivery` |
 | `WEBHOOK_DELIVERY_CONNECTION_ERROR` | DNS, TLS ou conexão recusada | idem |
-| `WEBHOOK_PAYLOAD_TOO_LARGE` | payload renderizado excede 64 KB | erro lançado em `publishWebhookEvent` **dentro da transação** de `changeStatus`; a transação sofre rollback ([09:24] Larissa) |
+| `WEBHOOK_PAYLOAD_TOO_LARGE` | payload renderizado excede 64 KB | erro lançado em `publishWebhookEvent` **dentro da transação** de `changeStatus`; a transação sofre rollback |
 | `WEBHOOK_SIGNATURE_ERROR` | falha ao calcular o HMAC (secret ausente ou inválida) | logado em `ERROR`; evento vai para retry |
 
 ## 7. Estratégias de resiliência
 
-- **Timeout:** 10 segundos por tentativa de envio ([09:42] Diego). Sem resposta nesse
-  prazo, a conexão é abortada e conta como falha.
-- **Retry:** 5 tentativas no total, backoff exponencial fixo `1min / 5min / 30min / 2h /
-  12h` ([09:17] Diego). O agendamento é por `next_attempt_at` na própria linha da outbox;
-  não há timer em memória, então um restart do worker não perde retries.
+- **Timeout:** 10 segundos por tentativa de envio. Sem resposta nesse prazo, a conexão é
+  abortada e conta como falha.
+- **Retry:** 5 tentativas no total, backoff exponencial fixo `1min, 5min, 30min, 2h, 12h`.
+  O agendamento é por `next_attempt_at` na própria linha da outbox; não há timer em
+  memória, então um restart do worker não perde retries.
 - **DLQ:** após a 5ª falha, o evento vai para `webhook_dead_letter` e sai do ciclo do
   worker. Reprocessamento só manual, via endpoint administrativo (§5.7)
   ([ADR-003](adrs/ADR-003-retry-com-backoff-e-dlq.md)).
@@ -359,8 +356,7 @@ Todos os códigos do módulo usam o prefixo `WEBHOOK_` ([09:29] Larissa) e herda
 
 ## 8. Observabilidade
 
-Reusa o `logger` Pino existente (`src/shared/logger/index.ts`), sem nada novo ([09:29]
-Bruno).
+Reusa o `logger` Pino existente (`src/shared/logger/index.ts`), sem nada novo.
 
 **Métricas** (contadores e histogramas expostos pelo worker e pela API):
 
@@ -376,12 +372,12 @@ Bruno).
 - `webhook_event_published`: `{ eventId, webhookEndpointId, orderId, toStatus }`.
 - `webhook_delivery_attempt`: `{ eventId, webhookEndpointId, attempt, statusCode, durationMs, result }`.
 - `webhook_event_dead_lettered`: `{ eventId, webhookEndpointId, lastError }`.
-- `webhook_replay_requested`: `{ deadLetterId, newOutboxEventId, replayedBy }` ([09:36] Sofia).
+- `webhook_replay_requested`: `{ deadLetterId, newOutboxEventId, replayedBy }`.
 - Erros de envio em nível `WARN`; erros internos (secret ausente, payload grande) em `ERROR`.
 
 **Tracing / correlação:** o `X-Request-Id` do `requestLogger`
-(`src/middlewares/request-logger.middleware.ts`) que originou a mudança de status é
-copiado para a linha da outbox e propagado nos logs de entrega, ligando a requisição
+(`src/middlewares/request-logger.middleware.ts`) que originou a mudança de status é copiado
+para a linha da outbox e propagado nos logs de entrega, ligando a requisição
 `PATCH /orders/:id/status` ao envio do webhook. O `eventId` correlaciona a linha da outbox,
 as linhas de `webhook_delivery` e, se aplicável, a linha da DLQ.
 
@@ -400,7 +396,7 @@ Compatibilidade:
   **não mudam**. `PATCH /orders/:id/status` ganha o efeito colateral de publicar eventos,
   mas a request e a response permanecem idênticas.
 - O middleware de erro central (`src/middlewares/error.middleware.ts`) trata os erros
-  `WEBHOOK_*` sem alteração, porque herdam de `AppError` ([09:29] Bruno).
+  `WEBHOOK_*` sem alteração, porque herdam de `AppError`.
 - O worker é um processo adicional; não afeta o deploy da API além de exigir um segundo
   serviço rodando `npm run worker`.
 
@@ -412,9 +408,9 @@ Compatibilidade:
       pedido **não** muda (rollback verificado em teste de integração).
 - [ ] Mudança de status sem endpoint interessado não escreve nada na outbox.
 - [ ] O worker entrega um evento em menos de 3 segundos quando o endpoint responde `200`
-      (2 s de polling + envio).
+      (2 s de polling mais envio).
 - [ ] Endpoint que responde `500` é retentado exatamente 5 vezes, com os intervalos
-      `1min / 5min / 30min / 2h / 12h`, e então vai para `webhook_dead_letter`.
+      `1min, 5min, 30min, 2h, 12h`, e então vai para `webhook_dead_letter`.
 - [ ] `X-Signature` verificável com a secret retornada na criação; após rotação, tanto a
       secret nova quanto a anterior verificam por 24 horas.
 - [ ] `url` `http://` é rejeitada com `WEBHOOK_INVALID_URL` (400).
@@ -445,14 +441,14 @@ Compatibilidade:
 - **Mitigação:**
   - Métrica `webhook_delivery_attempts_total` por `webhook_endpoint_id` para detectar o caso.
   - Rate limiting de saída fica registrado como questão em aberto no RFC, a ser
-    implementado se a métrica indicar necessidade ([09:39] Larissa).
+    implementado se a métrica indicar necessidade.
 - **Contingência:** desativar (`active = false`) o endpoint do cliente afetado
   temporariamente.
 
 ### Secret vazada em log do lado do cliente
 
-- **Probabilidade:** baixa, mas já ocorreu ([09:22] Diego). **Impacto:** um terceiro pode
-  forjar eventos para aquele endpoint.
+- **Probabilidade:** baixa, mas já ocorreu. **Impacto:** um terceiro pode forjar eventos
+  para aquele endpoint.
 - **Mitigação:**
   - Secret única por endpoint limita o raio de exposição a um cliente
     ([ADR-004](adrs/ADR-004-assinatura-hmac-sha256-secret-por-endpoint.md)).
@@ -472,10 +468,10 @@ Esta seção nomeia os arquivos reais do código base e descreve a integração 
 `OrderService.changeStatus` roda a mudança de status dentro de `prisma.$transaction`. A
 integração adiciona **uma chamada** ao final desse bloco, ainda dentro do `tx`:
 `await publishWebhookEvent(tx, refreshed, from, to)`. `publishWebhookEvent` é uma **função
-pura** que recebe o `Prisma.TransactionClient`, não um repository injetado ([09:41] Diego).
-Ela lê `webhook_endpoint` e escreve `webhook_outbox` usando o mesmo `tx`, de modo que a
-inserção dos eventos é atômica com a mudança de status. Se ela lançar, o `$transaction`
-reverte tudo, inclusive `order.update` e `orderStatusHistory.create`.
+pura** que recebe o `Prisma.TransactionClient`, não um repository injetado. Ela lê
+`webhook_endpoint` e escreve `webhook_outbox` usando o mesmo `tx`, de modo que a inserção
+dos eventos é atômica com a mudança de status. Se ela lançar, o `$transaction` reverte
+tudo, inclusive `order.update` e `orderStatusHistory.create`.
 
 ### `src/modules/orders/order.status.ts`
 
@@ -490,43 +486,42 @@ As classes de erro do módulo de webhooks herdam de `AppError` ou reusam
 `ConflictError` / `UnprocessableEntityError` / `NotFoundError` com um `code` próprio
 prefixado `WEBHOOK_` (por exemplo, `class WebhookNotFoundError extends NotFoundError` com
 `code = 'WEBHOOK_NOT_FOUND'`). Seguem o padrão de `InvalidStatusTransitionError` e
-`InsufficientStockError`, que já são subclasses especializadas ([09:28] Bruno).
+`InsufficientStockError`, que já são subclasses especializadas.
 
 ### `src/middlewares/error.middleware.ts`
 
 **Nenhuma alteração.** O middleware já serializa qualquer `AppError` para
 `{ error: { code, message, details? } }` e já trata `ZodError` (usado pelos schemas de
 webhook) e `Prisma.PrismaClientKnownRequestError` (P2002 cobre a constraint única de `url`
-por customer, se a implementação optar por delegar ao banco em vez de checar no service)
-([09:29] Bruno).
+por customer, se a implementação optar por delegar ao banco em vez de checar no service).
 
 ### `src/middlewares/auth.middleware.ts`
 
 As rotas de configuração de webhook usam `authenticate` no router, como
 `src/modules/customers/customer.routes.ts`. A rota de replay de DLQ encadeia
 `authenticate` e `requireRole('ADMIN')`, exatamente como
-`src/modules/users/user.routes.ts` faz em `GET /users/:id` ([09:36] Larissa). O
-`replayedBy` do log vem de `req.user.id`.
+`src/modules/users/user.routes.ts` faz em `GET /users/:id`. O `replayedBy` do log vem de
+`req.user.id`.
 
 ### `src/middlewares/validate.middleware.ts`
 
 Os schemas Zod de criação e edição de webhook são passados a `validate({ body, params, query })`
 no router, como nos outros módulos. A regra "URL tem que ser https" é um `.refine()` no
-schema, não lógica de service ([09:23] Sofia).
+schema, não lógica de service.
 
 ### `src/config/database.ts`
 
 Exporta o singleton `prisma` usado pela API. O worker **não** importa esse singleton: ele
 instancia o **próprio** `PrismaClient` em `src/worker.ts`, com a mesma `DATABASE_URL`,
-porque `PrismaClient` é por processo ([09:30] Bruno). O padrão de criação é o mesmo de
+porque `PrismaClient` é por processo. O padrão de criação é o mesmo de
 `createPrismaClient()`.
 
 ### `src/server.ts`
 
 Modelo para o novo entrypoint `src/worker.ts`: bootstrap assíncrono, tratamento de
 `SIGINT` / `SIGTERM` para encerrar o loop de polling de forma limpa e `prisma.$disconnect()`
-no shutdown ([09:11] Larissa). Um script `"worker": "tsx watch --env-file=.env src/worker.ts"`
-(e o equivalente de produção) entra no `package.json`.
+no shutdown. Um script `"worker": "tsx watch --env-file=.env src/worker.ts"` (e o
+equivalente de produção) entra no `package.json`.
 
 ### `src/app.ts`
 

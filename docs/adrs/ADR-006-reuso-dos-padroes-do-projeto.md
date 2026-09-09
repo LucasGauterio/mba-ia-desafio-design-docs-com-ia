@@ -10,7 +10,7 @@ O OMS já tem uma estrutura consolidada: cada domínio é um módulo em `src/mod
 controller, service, repository, routes e schemas; erros herdam de `AppError` com códigos
 em maiúsculas; o logger é Pino; um middleware de erro central trata `AppError`, `ZodError`
 e erros conhecidos do Prisma; a validação de entrada é feita por schemas Zod; todas as
-chaves primárias são UUID `CHAR(36)` ([09:27] a [09:30] Bruno).
+chaves primárias são UUID `CHAR(36)`.
 
 A feature de webhooks poderia introduzir bibliotecas ou padrões próprios (um cliente HTTP
 diferente, um formato de erro próprio, um esquema de logging separado). A decisão era se a
@@ -21,26 +21,24 @@ feature adota a stack e as convenções que já existem ou diverge delas.
 **Reuso máximo do que já existe.** Concretamente:
 
 - O módulo de webhooks vive em `src/modules/webhooks` com a mesma estrutura de
-  controller/service/repository/routes/schemas dos outros domínios ([09:27] Bruno).
+  controller/service/repository/routes/schemas dos outros domínios.
 - Os erros do módulo herdam de `AppError` e usam o prefixo `WEBHOOK_` em todos os códigos
   (`WEBHOOK_NOT_FOUND`, `WEBHOOK_INVALID_URL`, `WEBHOOK_SECRET_REQUIRED`, e assim por
-  diante) ([09:28] a [09:29] Bruno / Larissa). O middleware de erro central não precisa de
-  nenhuma alteração para tratá-los ([09:29] Bruno).
-- O logging usa o `logger` Pino já existente, sem nada novo ([09:29] Bruno).
-- As validações de entrada são schemas Zod, incluindo a exigência de `url` https ([09:23]
-  Sofia).
-- O replay de DLQ usa o `requireRole('ADMIN')` já existente ([09:36] Larissa).
+  diante). O middleware de erro central não precisa de nenhuma alteração para tratá-los.
+- O logging usa o `logger` Pino já existente, sem nada novo.
+- As validações de entrada são schemas Zod, incluindo a exigência de `url` https.
+- O replay de DLQ usa o `requireRole('ADMIN')` já existente.
 - Os identificadores (incluindo o `id` da outbox, que também é o `event_id`) são UUID,
-  seguindo o padrão do resto do projeto ([09:51] Larissa).
+  seguindo o padrão do resto do projeto.
 - O worker abre um `PrismaClient` próprio, com a mesma `DATABASE_URL`, porque `PrismaClient`
-  é por processo ([09:30] Bruno).
+  é por processo.
 
 ## Alternativas consideradas
 
 - **Introduzir padrões ou bibliotecas próprias para o módulo de webhooks** (formato de erro
   dedicado, logger separado, id auto-incremental na outbox). Descartada: aumentaria a
   superfície de manutenção sem ganho, e divergiria de uma codebase que já tem convenções
-  claras e funcionando ([09:30] Larissa; [09:51] Larissa).
+  claras e funcionando.
 
 ## Consequências
 

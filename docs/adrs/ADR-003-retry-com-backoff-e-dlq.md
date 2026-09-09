@@ -8,39 +8,37 @@
 
 O worker (ADR-002) faz chamadas HTTP para endpoints fora da infraestrutura da plataforma.
 Esses endpoints ficam indisponíveis: manutenção planejada, incidentes, deploys do lado do
-cliente. Já houve cliente com indisponibilidade de duas horas em manutenção planejada
-([09:16] Diego). Um envio sem resposta em 10 segundos é tratado como falha ([09:42]
-Diego).
+cliente. Já houve cliente com indisponibilidade de duas horas em manutenção planejada. Um
+envio sem resposta em 10 segundos é tratado como falha.
 
 Precisava-se decidir quantas vezes retentar, com qual espaçamento, e o que fazer quando o
 teto de tentativas é atingido, sem deixar eventos "pendurados para sempre" na outbox se um
-cliente sumiu ([09:15] Diego).
+cliente sumiu.
 
 ## Decisão
 
 **Retry com backoff exponencial, 5 tentativas**, com a progressão **1 minuto, 5 minutos,
-30 minutos, 2 horas, 12 horas** ([09:17] Diego). Isso cobre cerca de 15 horas entre a
-primeira falha e a última tentativa, considerado aceitável porque um cliente indisponível
-por 15 horas já tem um problema próprio sério ([09:17] Marcos / Larissa).
+30 minutos, 2 horas, 12 horas**. Isso cobre cerca de 15 horas entre a primeira falha e a
+última tentativa, considerado aceitável porque um cliente indisponível por 15 horas já tem
+um problema próprio sério.
 
 Depois da 5ª tentativa sem sucesso, o evento é considerado **falha permanente** e movido
-para uma **tabela separada `webhook_dead_letter`**, que guarda o payload, o motivo da
-falha e o timestamp ([09:18] Diego).
+para uma **tabela separada `webhook_dead_letter`**, que guarda o payload, o motivo da falha
+e o timestamp.
 
 O reprocessamento é **manual**, via `POST /admin/webhooks/dead-letter/:id/replay`, que
-recoloca o evento na outbox como pendente ([09:18] Diego).
+recoloca o evento na outbox como pendente.
 
 ## Alternativas consideradas
 
 - **3 tentativas.** Descartada: seria agressivo demais. Um cliente com indisponibilidade
   matinal seria retentado três vezes em cerca de 30 minutos e o evento morreria antes de o
-  cliente voltar ([09:16] Diego).
+  cliente voltar.
 - **Retry indefinido com backoff.** Descartada: um evento ficaria pendurado para sempre se
-  o endpoint do cliente sumisse de vez, sem um ponto claro de intervenção ([09:15] Diego).
+  o endpoint do cliente sumisse de vez, sem um ponto claro de intervenção.
 - **Marcar o evento como "failed" na própria `webhook_outbox`, sem tabela de DLQ.**
-  Descartada: manter os eventos falhados na outbox principal polui a leitura do worker;
-  uma tabela separada mantém a outbox limpa e serve de evidência para debug e
-  reprocessamento ([09:18] Diego).
+  Descartada: manter os eventos falhados na outbox principal polui a leitura do worker; uma
+  tabela separada mantém a outbox limpa e serve de evidência para debug e reprocessamento.
 
 ## Consequências
 
@@ -51,7 +49,7 @@ Positivas:
 - O endpoint de replay dá um caminho de recuperação auditável.
 
 Negativas e limitações aceitas:
-- Um evento pode demorar até ~15 horas para chegar ao cliente em cenário de falha
+- Uma notificação pode demorar até ~15 horas para chegar ao cliente em cenário de falha
   prolongada.
 - Eventos que falham em definitivo exigem ação manual de um administrador; não há
   reprocessamento automático da DLQ.

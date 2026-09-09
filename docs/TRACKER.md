@@ -1,9 +1,11 @@
 # Tracker de Rastreabilidade
 
 Referência cruzada de cada item registrado nos documentos com sua origem na transcrição
-(`TRANSCRICAO.md`, formato `[hh:mm] Nome`) ou no código (`caminho/de/arquivo`). Serve de
-defesa contra alucinação: item sem origem localizável foi corrigido ou removido do
-documento antes de esta tabela ser fechada.
+(`TRANSCRICAO.md`, formato `[hh:mm] Nome`) ou no código (`caminho/de/arquivo`).
+
+Este é o **único** lugar do pacote onde a origem de cada item é materializada: PRD, RFC,
+FDD e ADRs têm prosa limpa, sem `[hh:mm]`. Serve de defesa contra alucinação: item sem
+origem localizável foi corrigido ou removido do documento antes de esta tabela ser fechada.
 
 | ID | Documento | Tipo | Conteúdo (resumo) | Fonte | Localização |
 |---|---|---|---|---|---|

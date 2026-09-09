@@ -114,7 +114,7 @@ gerado no baseline:
 
 ## Iterações e ajustes
 
-Foram cerca de 6 ciclos principais. Os momentos concretos de correção:
+Foram cerca de 7 ciclos principais. Os momentos concretos de correção:
 
 1. **O plano do workflow passou por várias revisões antes de qualquer geração.** A primeira
    versão criava uma pasta `scripts/` de shell no repositório e usava um prefixo curto
@@ -148,6 +148,14 @@ Foram cerca de 6 ciclos principais. Os momentos concretos de correção:
 6. **O hook de `gitleaks` do repositório barrou o commit do FDD** porque os valores de
    `secret` nos exemplos de payload JSON tinham entropia de chave real. Foram trocados por
    placeholders sem entropia (`whsec_EXEMPLO_...`).
+
+7. **A primeira versão colocava a citação de fonte inline em toda a prosa** (um marcador de
+   timestamp com o nome do falante ao fim de cada frase do PRD/RFC/FDD/ADR). O enunciado
+   exige que a informação seja rastreável, não que a citação apareça no corpo. As rules e
+   skills foram reescritas para deixar a rastreabilidade **só no `TRACKER.md`**, e os
+   quatro tipos de documento foram regerados com prosa limpa, mantendo a cobertura do
+   Tracker. Junto, a convenção de worktrees mudou para dentro do projeto (`.worktrees/`,
+   gitignored).
 
 ## Como navegar a entrega
 

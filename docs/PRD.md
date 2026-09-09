@@ -5,10 +5,10 @@ Data: 2026-09-09
 Responsável: Marcos (Product Manager)
 Status: em revisão
 
-Consolida o contexto de produto da feature. As decisões técnicas estão nos
-[ADRs](adrs/), a proposta de arquitetura no [RFC](RFC.md) e o detalhamento de
-implementação no [FDD](FDD.md). Este PRD não desce a componentes, endpoints ou
-infraestrutura.
+Consolida o contexto de produto da feature. As decisões técnicas estão nos [ADRs](adrs/),
+a proposta de arquitetura no [RFC](RFC.md) e o detalhamento de implementação no
+[FDD](FDD.md). Este PRD não desce a componentes, endpoints ou infraestrutura. A origem de
+cada item está no [TRACKER](TRACKER.md).
 
 ---
 
@@ -26,40 +26,37 @@ mudança confirmada deixa de gerar notificação.
 ### Público-alvo
 
 - Clientes B2B que integram com a API do OMS. Três pediram a feature formalmente: Atlas
-  Comercial, MaxDistribuição e Nova Cargo ([09:00] Marcos).
+  Comercial, MaxDistribuição e Nova Cargo.
 - Times de integração desses clientes, que hoje mantêm rotinas de polling.
 - Administradores da plataforma, que precisam reprocessar entregas que falharam em
-  definitivo ([09:35] Larissa).
+  definitivo.
 
 ### Cenários de uso
 
 - Um cliente quer ser avisado assim que um pedido dele é marcado como `SHIPPED` ou
-  `DELIVERED`, sem precisar consultar a API ([09:33] Marcos).
+  `DELIVERED`, sem precisar consultar a API.
 - Um cliente cadastra mais de um endpoint (por exemplo, um para logística e outro para
-  faturamento) e filtra os status que cada um recebe ([09:33] Bruno; [09:44] Sofia).
+  faturamento) e filtra os status que cada um recebe.
 - O endpoint de um cliente fica indisponível por algumas horas durante uma manutenção; ao
-  voltar, ele ainda recebe as notificações do período ([09:16] Diego).
+  voltar, ele ainda recebe as notificações do período.
 - Um administrador identifica que uma notificação falhou todas as tentativas e a
-  reenfileira manualmente ([09:18] Diego).
+  reenfileira manualmente.
 
 ### Onde a feature roda
 
 No próprio Order Management System, que já está em produção. Adiciona um módulo à API
-existente e um processo de entrega separado ([09:11] Larissa). Nenhuma infraestrutura nova
-([09:07] Diego).
+existente e um processo de entrega separado. Nenhuma infraestrutura nova.
 
 ### Problemas priorizados
 
 - **Integração lenta e cara para o cliente.** O polling constante no `GET /orders` consome
   recursos dos dois lados e atrasa a reação do cliente à mudança de status. Prioridade
-  alta: a Atlas indicou que pode migrar para um concorrente se a feature não sair até o
-  fim do trimestre ([09:00] Marcos).
+  alta: a Atlas indicou que pode migrar para um concorrente se a feature não sair até o fim
+  do trimestre.
 - **Falta de notificação em tempo hábil.** Os clientes consideram "tempo real" qualquer
-  latência abaixo de 10 segundos; o polling não garante isso ([09:02] Marcos). Prioridade
-  alta.
+  latência abaixo de 10 segundos; o polling não garante isso. Prioridade alta.
 - **Risco de perder eventos.** Qualquer solução tem que garantir que uma mudança de status
-  confirmada sempre gera notificação, mesmo que a entrega demore ([09:41] Diego).
-  Prioridade alta.
+  confirmada sempre gera notificação, mesmo que a entrega demore. Prioridade alta.
 
 ## Objetivos e métricas
 
@@ -84,27 +81,22 @@ existente e um processo de entrega separado ([09:11] Larissa). Nenhuma infraestr
 - Entrega assíncrona com retry, backoff e fila de eventos que falharam em definitivo.
 - Consulta, pelo cliente, do histórico das últimas entregas de um endpoint.
 - Reprocessamento manual, por administrador, de um item da fila de falhas.
-- Documentação de integração no portal de desenvolvedor ([09:26] Marcos; [09:40] Marcos).
+- Documentação de integração no portal de desenvolvedor.
 
 ### Fora de escopo
 
 - **E-mail ou qualquer alerta ao cliente quando o webhook dele falha repetidamente.**
-  Adiado para uma fase futura, depois de medir o impacto ([09:37] Marcos; [09:37]
-  Larissa).
+  Adiado para uma fase futura, depois de medir o impacto.
 - **Dashboard ou painel visual** para o cliente acompanhar os webhooks. É um projeto
-  separado do time de frontend ([09:39] Marcos; [09:40] Larissa).
+  separado do time de frontend.
 - **Garantia de ordem global** entre notificações de pedidos diferentes. A ordem é
-  garantida apenas por pedido; os clientes nunca pediram ordem global ([09:12] Diego;
-  [09:14] Marcos).
+  garantida apenas por pedido; os clientes nunca pediram ordem global.
 - **Rate limiting das notificações enviadas a um cliente.** Fica como ponto a observar e
-  decidir depois, se o volume de chamadas simultâneas virar problema ([09:38] Diego;
-  [09:39] Larissa).
-- **Arquivamento das notificações já entregues.** Fora do escopo desta feature ([09:08]
-  Diego).
-- **Webhooks de entrada** (o cliente enviando dados para a plataforma). Só saída ([09:02]
-  Marcos; [09:03] Sofia).
+  decidir depois, se o volume de chamadas simultâneas virar problema.
+- **Arquivamento das notificações já entregues.** Fora do escopo desta feature.
+- **Webhooks de entrada** (o cliente enviando dados para a plataforma). Só saída.
 - **Processar entrega da fila de falhas de forma automática** e escalar para múltiplos
-  processos de entrega. Problema do futuro ([09:13] Diego).
+  processos de entrega. Problema do futuro.
 
 ## Requisitos funcionais
 
@@ -191,8 +183,7 @@ gera notificação para os endpoints que incluem aquele status.
   daquele pedido cuja lista contém o novo status.
 
 **Fluxos alternativos e exceções**
-- Se nenhum endpoint do cliente quer aquele status, nenhuma notificação é gerada ([09:34]
-  Bruno).
+- Se nenhum endpoint do cliente quer aquele status, nenhuma notificação é gerada.
 
 **Erros previstos**
 - Status fora dos valores válidos do ciclo de vida do pedido.
@@ -271,8 +262,7 @@ notificação mais de uma vez e deve deduplicar por esse identificador.
 - Reenvio após instabilidade: o cliente reconhece a duplicata pelo identificador.
 
 **Erros previstos**
-- Nenhum do lado da plataforma; a deduplicação é responsabilidade do cliente ([09:25]
-  Sofia).
+- Nenhum do lado da plataforma; a deduplicação é responsabilidade do cliente.
 
 **Prioridade:** alta
 
@@ -284,7 +274,7 @@ tempo de resposta.
 **Fluxo principal**
 - O usuário solicita o histórico de um endpoint.
 - A plataforma retorna as últimas entregas (por volta de 100), cada uma com sucesso ou
-  falha, número da tentativa, resposta e duração ([09:34] Marcos).
+  falha, número da tentativa, resposta e duração.
 
 **Fluxos alternativos e exceções**
 - Endpoint inexistente é recusado.
@@ -302,7 +292,7 @@ autor.
 **Fluxo principal**
 - O administrador solicita o replay de um item da fila de falhas.
 - A plataforma cria um novo evento pendente a partir do payload guardado e registra quem
-  fez o replay ([09:36] Sofia).
+  fez o replay.
 
 **Fluxos alternativos e exceções**
 - Usuário sem papel de administrador é recusado.
@@ -325,7 +315,7 @@ registro do evento falha, a mudança de status também é desfeita.
 
 **Fluxos alternativos e exceções**
 - Falha ao registrar o evento: a mudança de status é revertida e o cliente da API recebe
-  erro ([09:40] Bruno).
+  erro.
 
 **Erros previstos**
 - Falha de registro do evento (por exemplo, payload acima do limite de tamanho).
@@ -335,39 +325,39 @@ registro do evento falha, a mudança de status também é desfeita.
 ## Requisitos não funcionais
 
 **Latência**
-- A notificação deve chegar em menos de 10 segundos no caminho feliz ([09:02] Marcos). O
-  pior caso da fila é 2 segundos de polling mais o tempo de envio ([09:10] Larissa).
+- A notificação deve chegar em menos de 10 segundos no caminho feliz. O pior caso da fila é
+  2 segundos de polling mais o tempo de envio.
 
 **Confiabilidade e integridade**
 - Se a mudança de status foi confirmada, o evento foi registrado; se foi revertida, o
-  evento não existe ([09:41] Diego).
-- Garantia de entrega at-least-once ([09:24] Diego).
-- A ordem de notificação é garantida por pedido, não globalmente ([09:12] Diego).
+  evento não existe.
+- Garantia de entrega at-least-once.
+- A ordem de notificação é garantida por pedido, não globalmente.
 
 **Segurança**
-- Cada envio é assinado com HMAC-SHA256 sobre o corpo ([09:20] Sofia).
+- Cada envio é assinado com HMAC-SHA256 sobre o corpo.
 - Cada endpoint tem uma secret única, nunca uma secret global; rotação com convivência de
-  24 horas ([09:21] Sofia).
-- A URL de destino tem que usar HTTPS ([09:23] Sofia).
-- O replay administrativo exige papel de administrador e é auditado ([09:36] Sofia).
+  24 horas.
+- A URL de destino tem que usar HTTPS.
+- O replay administrativo exige papel de administrador e é auditado.
 - A plataforma nunca registra a secret nem o corpo assinado em log.
 - A revisão de segurança da geração de secret e do HMAC acontece antes do deploy, com pelo
-  menos dois dias úteis reservados ([09:46] Sofia).
+  menos dois dias úteis reservados.
 
 **Limites**
 - O corpo da notificação não pode passar de 64 KB; acima disso, a plataforma trata como
-  erro em vez de truncar ([09:23] Sofia; [09:24] Diego).
-- Timeout de 10 segundos por tentativa de envio ([09:42] Diego).
+  erro em vez de truncar.
+- Timeout de 10 segundos por tentativa de envio.
 
 **Observabilidade**
 - Logs estruturados de publicação, tentativa de entrega, falha permanente e replay.
-- Métricas de eventos pendentes, tentativas por resultado, duração de envio e itens em
-  fila de falhas.
+- Métricas de eventos pendentes, tentativas por resultado, duração de envio e itens em fila
+  de falhas.
 - Correlação entre a requisição que mudou o status e a entrega da notificação.
 
 **Compatibilidade**
 - A feature reaproveita a stack e os padrões atuais do projeto, sem bibliotecas novas de
-  erro, log ou validação ([09:29] Bruno; [09:30] Larissa).
+  erro, log ou validação.
 - Os contratos HTTP existentes de pedidos, clientes e produtos não mudam.
 
 ## Decisões e trade-offs principais
@@ -405,20 +395,18 @@ O detalhamento e o contexto completo estão nos ADRs; aqui vai o resumo.
 
 ### Técnica: alteração no fluxo de mudança de status
 A operação de mudança de status do pedido precisa passar a registrar o evento na mesma
-transação. É a única alteração de comportamento no código existente ([09:40] Bruno).
+transação. É a única alteração de comportamento no código existente.
 
 ### Técnica: novo processo de entrega em produção
-A operação precisa provisionar e monitorar um segundo processo, além do servidor da API
-([09:11] Diego).
+A operação precisa provisionar e monitorar um segundo processo, além do servidor da API.
 
 ### Organizacional: janela de revisão de segurança
 A engenheira de segurança precisa de pelo menos dois dias úteis reservados para revisar a
-geração de secret e a assinatura antes do deploy ([09:46] Sofia).
+geração de secret e a assinatura antes do deploy.
 
 ### Externa: endpoints dos clientes
 Os clientes solicitantes precisam expor endpoints HTTPS capazes de validar a assinatura e
-responder em até 10 segundos, e implementar a deduplicação por identificador de evento
-([09:25] Diego; [09:26] Marcos).
+responder em até 10 segundos, e implementar a deduplicação por identificador de evento.
 
 ## Riscos e mitigação
 
@@ -437,7 +425,7 @@ responder em até 10 segundos, e implementar a deduplicação por identificador 
 
 ### Um cliente com muitas mudanças de status simultâneas recebe uma rajada de chamadas
 - **Probabilidade:** média
-- **Impacto:** o processo de entrega sobrecarrega o endpoint do cliente ([09:38] Diego).
+- **Impacto:** o processo de entrega sobrecarrega o endpoint do cliente.
 - **Mitigação:**
   - Acompanhar a métrica de tentativas de entrega por endpoint.
   - Avaliar rate limiting de saída se a métrica indicar necessidade (ponto em aberto no
@@ -445,7 +433,7 @@ responder em até 10 segundos, e implementar a deduplicação por identificador 
 - **Plano de contingência:** desativar temporariamente o endpoint do cliente afetado.
 
 ### Secret vazada em log do lado do cliente
-- **Probabilidade:** baixa, mas já aconteceu com um cliente ([09:22] Diego)
+- **Probabilidade:** baixa, mas já aconteceu com um cliente
 - **Impacto:** um terceiro pode forjar notificações para aquele endpoint.
 - **Mitigação:**
   - Secret única por endpoint limita o dano a um cliente.
@@ -458,8 +446,8 @@ responder em até 10 segundos, e implementar a deduplicação por identificador 
 - **Probabilidade:** média
 - **Impacto:** o deploy atrasa ou a revisão de segurança é encurtada.
 - **Mitigação:**
-  - A estimativa de 3 sprints já inclui a revisão da Sofia no fim ([09:47] Larissa).
-  - Reservar os dois dias úteis de revisão no cronograma desde o início ([09:46] Sofia).
+  - A estimativa de 3 sprints já inclui a revisão da Sofia no fim.
+  - Reservar os dois dias úteis de revisão no cronograma desde o início.
 - **Plano de contingência:** entregar o CRUD de configuração e a publicação de eventos numa
   primeira etapa e a entrega efetiva numa segunda, se o prazo apertar.
 
@@ -497,5 +485,5 @@ responder em até 10 segundos, e implementar a deduplicação por identificador 
 **Abordagem de validação**
 - TDD para a lógica de retry e backoff e para o filtro de status.
 - Revisão de segurança guiada por roteiro, conduzida pela engenheira de segurança, antes do
-  deploy ([09:46] Sofia).
+  deploy.
 - Nenhum teste existente de pedidos, autenticação, clientes ou produtos pode quebrar.

@@ -130,8 +130,8 @@ A entrega deste repositório é **documental**. Regras sempre ativas (`.claude/r
 
 - [`source-code-is-read-only.md`](.claude/rules/source-code-is-read-only.md): não editar
   `src/`, `prisma/`, `tests/` nem configs. Só `docs/**`, `CLAUDE.md`, `README.md`, `.claude/**`.
-- [`traceability-required.md`](.claude/rules/traceability-required.md): todo item de
-  documento tem origem em `[hh:mm] Nome` da transcrição ou em caminho de arquivo real.
+- [`traceability-required.md`](.claude/rules/traceability-required.md): a rastreabilidade
+  vive só no `docs/TRACKER.md`; a prosa do PRD/RFC/FDD/ADR fica limpa, sem `[hh:mm]`.
 - [`no-cross-document-duplication.md`](.claude/rules/no-cross-document-duplication.md):
   cada documento na sua altura; referência cruzada em vez de cópia.
 - [`honor-rejected-scope.md`](.claude/rules/honor-rejected-scope.md): itens que a reunião

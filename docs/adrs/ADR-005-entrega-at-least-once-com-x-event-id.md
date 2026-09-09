@@ -12,27 +12,26 @@ segundos. Nesse caso o worker vai retentar e o cliente receberá o mesmo evento 
 vez.
 
 Era preciso decidir qual garantia de entrega oferecer e como o cliente distingue uma
-duplicata ([09:24] Diego).
+duplicata.
 
 ## Decisão
 
 A garantia é **at-least-once**: o cliente pode receber o mesmo evento duas ou mais vezes e
-precisa estar preparado para isso ([09:24] Diego).
+precisa estar preparado para isso.
 
 Cada evento carrega um `event_id` (UUID) gerado no momento em que o evento entra na outbox,
 único por evento, enviado no header `X-Event-Id`. O cliente **deduplica pelo `event_id`**
-do lado dele ([09:25] Diego). Esse é o mesmo mecanismo que Stripe e GitHub usam para
-webhooks ([09:25] Diego).
+do lado dele. Esse é o mesmo mecanismo que Stripe e GitHub usam para webhooks.
 
 O comportamento at-least-once e a necessidade de dedupe serão documentados de forma
-destacada no portal de desenvolvedor dos clientes ([09:26] Marcos).
+destacada no portal de desenvolvedor dos clientes.
 
 ## Alternativas consideradas
 
 - **Exactly-once (garantir que o cliente processa o evento exatamente uma vez).**
   Descartada: exigiria coordenação entre os dois lados (a plataforma e o sistema do
   cliente), o que aumenta muito a complexidade. At-least-once com `event_id` resolve a
-  grande maioria dos casos com esforço muito menor ([09:25] Diego).
+  grande maioria dos casos com esforço muito menor.
 
 ## Consequências
 
@@ -42,8 +41,8 @@ Positivas:
 - A plataforma não precisa manter estado de "confirmação de processamento" por cliente.
 
 Negativas e limitações aceitas:
-- A responsabilidade de deduplicar é transferida para o cliente ([09:25] Sofia), o que
-  precisa ser comunicado com clareza no portal de desenvolvedor.
+- A responsabilidade de deduplicar é transferida para o cliente, o que precisa ser
+  comunicado com clareza no portal de desenvolvedor.
 - O `event_id` (UUID) passa a ser um campo obrigatório do payload e da tabela de outbox, e
   fica atrelado à decisão de usar UUID como identificador (ver ADR-006).
 

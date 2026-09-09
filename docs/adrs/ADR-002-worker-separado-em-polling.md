@@ -10,37 +10,33 @@ Com o padrão outbox decidido (ADR-001), os eventos ficam numa tabela do MySQL e
 precisa lê-los e disparar as chamadas HTTP para os endpoints dos clientes. Duas questões:
 como esse componente descobre que há eventos novos, e onde ele roda.
 
-Os clientes consideram "tempo real" qualquer coisa **abaixo de 10 segundos** ([09:02]
-Marcos). O MySQL não tem um mecanismo de notificação para processos externos equivalente
-ao `LISTEN/NOTIFY` do PostgreSQL ([09:09] Diego). A API hoje roda como um único processo
-(`src/server.ts`); se o componente de envio rodasse dentro dela, um restart da API
-derrubaria o envio junto ([09:11] Diego).
+Os clientes consideram "tempo real" qualquer coisa abaixo de 10 segundos. O MySQL não tem
+um mecanismo de notificação para processos externos equivalente ao `LISTEN/NOTIFY` do
+PostgreSQL. A API hoje roda como um único processo (`src/server.ts`); se o componente de
+envio rodasse dentro dela, um restart da API derrubaria o envio junto.
 
 ## Decisão
 
 O envio é feito por um **worker em processo separado**, com um novo entry-point
-(`src/worker.ts`) e um script `npm run worker`, no mesmo estilo do `src/server.ts`
-([09:11] Larissa). O worker conecta no **mesmo banco** com um `PrismaClient` próprio (ver
-ADR-006).
+(`src/worker.ts`) e um script `npm run worker`, no mesmo estilo do `src/server.ts`. O
+worker conecta no **mesmo banco** com um `PrismaClient` próprio (ver ADR-006).
 
 O worker descobre eventos novos por **polling em loop**: a cada **2 segundos** busca os
-eventos pendentes mais antigos, processa e marca ([09:09] Diego). A latência mínima de
-notificação passa a ser 2 segundos no pior caso, o que foi aceito por atender folgadamente
-o requisito de "abaixo de 10 segundos" ([09:10] Larissa / Marcos).
+eventos pendentes mais antigos, processa e marca. A latência mínima de notificação passa a
+ser 2 segundos no pior caso, o que foi aceito por atender folgadamente o requisito de
+"abaixo de 10 segundos".
 
 Enquanto houver **um único worker**, os eventos de um mesmo pedido são processados em ordem
 de `created_at` da outbox, garantindo ordenação **por `order_id`**. Não há garantia de
-ordenação global, e os clientes nunca pediram isso ([09:12] a [09:14] Diego / Larissa /
-Marcos).
+ordenação global, e os clientes nunca pediram isso.
 
 ## Alternativas consideradas
 
 - **Trigger de banco para acordar o worker de forma reativa.** Descartada: um trigger no
   MySQL só executa SQL, não notifica um processo externo; improvisar (escrever em arquivo,
-  bater num endpoint) ficaria frágil, e o polling de 2 s já atende o requisito de latência
-  ([09:09] Diego).
+  bater num endpoint) ficaria frágil, e o polling de 2 s já atende o requisito de latência.
 - **Worker dentro da mesma instância da API.** Descartada: acoplaria o ciclo de vida do
-  envio ao da API; um restart da API pararia o processamento de eventos ([09:11] Diego).
+  envio ao da API; um restart da API pararia o processamento de eventos.
 
 ## Consequências
 
@@ -53,8 +49,7 @@ Negativas e limitações aceitas:
 - Latência de até 2 segundos antes de a primeira tentativa de envio ocorrer.
 - Passa a existir um segundo processo para operar, monitorar e fazer deploy.
 - Ordenação global não é garantida. Escalar para múltiplos workers (particionando por
-  `order_id` ou com lock pessimista) fica como trabalho futuro fora desta feature ([09:13]
-  Diego).
+  `order_id` ou com lock pessimista) fica como trabalho futuro fora desta feature.
 
 ## Referências
 
