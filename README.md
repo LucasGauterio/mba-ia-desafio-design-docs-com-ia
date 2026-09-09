@@ -35,7 +35,7 @@ um **workflow versionado do Claude Code**, em `.claude/`, para que a mesma máqu
 processar transcrições futuras sem reconstruir o conhecimento de referência a cada
 execução. A doc do workflow está em [`.claude/README.md`](.claude/README.md) e o registro
 completo do processo em
-[`docs/process/design-docs-workflow-plan.md`](docs/process/design-docs-workflow-plan.md).
+[`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md).
 
 Estrutura de branches e worktrees (git):
 
@@ -155,7 +155,8 @@ Foram cerca de 7 ciclos principais. Os momentos concretos de correção:
    skills foram reescritas para deixar a rastreabilidade **só no `TRACKER.md`**, e os
    quatro tipos de documento foram regerados com prosa limpa, mantendo a cobertura do
    Tracker. Junto, a convenção de worktrees mudou para dentro do projeto (`.worktrees/`,
-   gitignored).
+   gitignored) e a pasta `docs/process/` (que o `DESAFIO.md` não previa) foi movida para
+   `DESIGN_DOCS_PROCESS.md` na raiz.
 
 ## Como navegar a entrega
 
@@ -172,6 +173,6 @@ Ordem sugerida de leitura:
    diagramas Mermaid de apoio ao FDD.
 7. [`docs/TRACKER.md`](docs/TRACKER.md): a rastreabilidade de cada item à transcrição ou
    ao código.
-8. [`docs/process/design-docs-workflow-plan.md`](docs/process/design-docs-workflow-plan.md)
+8. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md)
    e [`.claude/README.md`](.claude/README.md): o workflow que produziu tudo isso e como
    rodá-lo em outra transcrição.

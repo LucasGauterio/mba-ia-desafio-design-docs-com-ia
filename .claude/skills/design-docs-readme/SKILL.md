@@ -13,7 +13,7 @@ description: >-
 - `.claude/workflow-build/plan-progress.md` → "Log de ciclos de teste" (iterações reais).
 - `docs/_workbench/run-state.md` e `validation-report.md` (o que passou/falhou por ciclo).
 - As skills e commands do workflow (fonte dos "prompts customizados").
-- `docs/process/design-docs-workflow-plan.md` (referência do processo completo).
+- `DESIGN_DOCS_PROCESS.md` (referência do processo completo).
 
 ## Estrutura obrigatória do novo README
 
@@ -51,7 +51,7 @@ Caminho dos arquivos e ordem sugerida de leitura:
 4. `docs/adrs/`: decisões
 5. `docs/FDD.md` + `docs/diagrams/`: como implementar
 6. `docs/TRACKER.md`: rastreabilidade
-7. `docs/process/design-docs-workflow-plan.md`: o processo completo
+7. `DESIGN_DOCS_PROCESS.md`: o processo completo
 ```
 
 Manter, se quiser, um link para o enunciado original (está em `DESAFIO.md`).

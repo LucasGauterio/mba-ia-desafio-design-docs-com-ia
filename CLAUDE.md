@@ -143,4 +143,4 @@ Este repositório carrega o workflow **`design-docs`** (`.claude/skills/design-d
 `.claude/commands/`, `.claude/references/`). Ele transforma uma transcrição de reunião + o
 código existente em um pacote de design docs. Ponto de entrada: `/design-docs`. Doc do
 workflow: `.claude/README.md`. Plano/registro do processo:
-`docs/process/design-docs-workflow-plan.md`.
+`DESIGN_DOCS_PROCESS.md`.

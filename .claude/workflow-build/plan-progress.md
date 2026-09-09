@@ -2,13 +2,14 @@
 
 > Estado da construção do workflow. Numa sessão de manutenção, ler este arquivo antes de
 > agir e retomar do primeiro item `- [ ]`. Fonte do plano:
-> `docs/process/design-docs-workflow-plan.md`.
+> `DESIGN_DOCS_PROCESS.md`.
 
-- **Estado:** concluído. Pipeline validado em 34 de 34 critérios de aceite.
+- **Estado:** concluído. Pipeline validado em 36 de 36 critérios (34 do `DESAFIO.md`, mais
+  "prosa limpa" e "zero em-dash").
 
 ## Fases
 
-- [x] 0. Setup: plano em `docs/process/design-docs-workflow-plan.md`, este registro criado.
+- [x] 0. Setup: plano em `DESIGN_DOCS_PROCESS.md`, este registro criado.
 - [x] 1. `design-docs-baseline` (skill + command) e o baseline gerado: `CLAUDE.md`,
       `.claude/references/codebase/existing-app.md`, `.claude/references/codebase/integration-points.md`.
 - [x] 2. Guias de método: `references/architecture/{fdd,rfc,adr,diagrams,c4}.md`,
@@ -22,10 +23,10 @@
       `-readme`; orquestrador `design-docs` retomável via `docs/_workbench/run-state.md`;
       `design-docs.config.json`.
 - [x] 6. Validação: `design-docs-validate` com checagens mecânicas por documento.
-- [x] 7. Teste em worktree `design-docs/<timestamp>` a partir de `dev`: pipeline completo,
-      validação 34 de 34.
+- [x] 7. Teste em worktree `.worktrees/design-docs-run-<timestamp>` a partir de `dev`:
+      pipeline completo, validação 36 de 36.
 - [x] 8. Entrega em `dev`: pacote validado, `docs/_workbench/` fora da entrega.
-- [x] 9. Documentação: `.claude/README.md` e `docs/process/design-docs-workflow-plan.md`.
+- [x] 9. Documentação: `.claude/README.md` e `DESIGN_DOCS_PROCESS.md`.
 
 ## Iterações do ciclo de teste
 
@@ -36,5 +37,9 @@
 3. Bloco "Cobertura" do Tracker com contagens estimadas erradas; recontado por `grep`.
 4. `gitleaks` barrou o commit do FDD por entropia nos valores de `secret` dos exemplos;
    trocados por placeholders sem entropia.
+5. Citação de fonte inline (`[hh:mm] Nome`) em toda a prosa; regra mudada para
+   rastreabilidade só no `docs/TRACKER.md`, os 4 tipos de documento regerados.
+6. `docs/process/` (que o `DESAFIO.md` não previa) movido para `DESIGN_DOCS_PROCESS.md` na
+   raiz. Worktrees passaram a ficar dentro do projeto, em `.worktrees/` (gitignored).
 
 Detalhe completo na seção "Iterações e ajustes" do `README.md`.

@@ -1,9 +1,9 @@
 # Processo: workflow `design-docs`
 
 Registro de como o pacote de design docs deste repositório foi produzido, e de como o
-workflow reutilizável foi construído. Companion do [`README.md`](../../README.md) da raiz
-(que é o README do processo exigido pelo desafio) e da doc do workflow em
-[`.claude/README.md`](../../.claude/README.md).
+workflow reutilizável foi construído. Companion do [`README.md`](README.md) da raiz (que é
+o README do processo exigido pelo desafio) e da doc do workflow em
+[`.claude/README.md`](.claude/README.md).
 
 ## Objetivo
 
@@ -13,8 +13,9 @@ existente em um pacote de design docs rastreável (PRD, RFC, FDD, 5 a 8 ADRs, di
 Tracker, README do processo). O mesmo workflow serve para transcrições futuras.
 
 **Restrições:** entrega puramente documental (não tocar em `src/`, `prisma/`, `tests/`,
-configs); todo item rastreável à transcrição (`[hh:mm] Nome`) ou a um arquivo real; nada
-inventado; itens que a reunião descartou ou adiou não viram requisito.
+configs); todo item rastreável à transcrição ou a um arquivo real, com a origem
+materializada no `docs/TRACKER.md` (a prosa dos documentos fica limpa, sem timestamps);
+nada inventado; itens que a reunião descartou ou adiou não viram requisito.
 
 ## Design do workflow
 
@@ -60,8 +61,8 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
 
 ## Fases da construção
 
-0. **Setup.** Persistir este documento e criar o registro de progresso em
-   `.claude/workflow-build/plan-progress.md`.
+0. **Setup.** Persistir este documento (`DESIGN_DOCS_PROCESS.md` na raiz) e criar o registro
+   de progresso em `.claude/workflow-build/plan-progress.md`.
 1. **`design-docs-baseline`.** Skill que inspeciona o código (ignorando `DESAFIO.md`,
    `TRANSCRICAO.md`, `README.md`) e escreve `CLAUDE.md` e `.claude/references/codebase/`.
 2. **Guias de método.** Escrever `.claude/references/architecture/*`,
@@ -73,7 +74,7 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
    `docs/_workbench/run-state.md`).
 6. **Validação.** Skill `design-docs-validate` com checagens mecânicas por documento.
 7. **Teste em worktree.** Runbook no `.claude/README.md`; rodar o pipeline numa worktree
-   `design-docs/<timestamp>` a partir de `dev`, validar, iterar.
+   `.worktrees/design-docs-run-<timestamp>` a partir de `dev`, validar, iterar.
 8. **Entrega.** Trazer o pacote validado para `dev`, revalidar contra os critérios de
    aceite, remover a área de trabalho `docs/_workbench/`.
 9. **Documentar.** `.claude/README.md` e este arquivo.
@@ -96,26 +97,26 @@ As worktrees de execução ficam **dentro do projeto**, em `.worktrees/` (gitign
 
 ## Teste e iterações
 
-O pipeline foi rodado uma vez de ponta a ponta numa worktree criada a partir de `dev`.
-Resultado da validação: **34 de 34 critérios de aceite do `DESAFIO.md`**. As correções
-feitas durante o ciclo estão detalhadas na seção "Iterações e ajustes" do
-[`README.md`](../../README.md): revisões do plano; git bloqueado pelo ambiente; travessão
-longo (em-dash) violando a regra de estilo; a seção de integração do FDD começou genérica;
-contagens do Tracker feitas de cabeça; `gitleaks` barrando secrets de exemplo com entropia
-alta.
+O pipeline foi rodado de ponta a ponta numa worktree criada a partir de `dev`. Resultado da
+validação: **36 de 36 critérios** (os 34 de aceite do `DESAFIO.md` mais "prosa limpa" e
+"zero em-dash"). As correções feitas durante os ciclos estão detalhadas na seção "Iterações
+e ajustes" do [`README.md`](README.md): revisões do plano; git bloqueado pelo ambiente;
+travessão longo (em-dash) violando a regra de estilo; a seção de integração do FDD começou
+genérica; contagens do Tracker feitas de cabeça; `gitleaks` barrando secrets de exemplo com
+entropia alta; citação de fonte inline movida para o Tracker.
 
 ## Estrutura final da entrega
 
 ```
 CLAUDE.md                     # baseline da aplicação
 DESAFIO.md                    # enunciado original (preservado)
+DESIGN_DOCS_PROCESS.md        # este arquivo
 TRANSCRICAO.md                # transcrição (não alterada)
 README.md                     # README do processo
 docs/
   PRD.md  RFC.md  FDD.md  TRACKER.md
   adrs/ADR-001..007-*.md  adrs/README.md
   diagrams/webhooks-diagrams.md
-  process/design-docs-workflow-plan.md   # este arquivo
 .claude/
   design-docs.config.json  README.md
   skills/design-docs*/SKILL.md
@@ -134,8 +135,9 @@ docs/
   ao resultado da execução.
 - Workflow self-contained: skills e references próprias para tudo, inclusive ADR e
   diagramas. Plugins de terceiros ficam como alternativa opcional.
-- Diagramas Mermaid gerados por padrão junto do FDD.
+- Diagramas Mermaid gerados por padrão junto do FDD, em `docs/diagrams/`.
 - RFC ocupa a altura de arquitetura (proposta submetida a revisão), com estrutura
   construída a partir do requisito 2 do enunciado.
 - Ordem de autoria: ADR, RFC, FDD com diagramas, PRD, Tracker, README.
+- Rastreabilidade só no `docs/TRACKER.md`; a prosa dos documentos fica limpa.
 - Progresso retomável em dois níveis (construção do workflow e execução do pipeline).
