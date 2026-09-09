@@ -13,6 +13,9 @@ coverage/
 # Worktrees de execução do workflow design-docs (descartáveis, dentro do projeto)
 .worktrees/
 
+# Área de trabalho do workflow: não entra no entregável
+docs/_workbench/
+
 # Material de referência de terceiros e config local do Claude Code:
 # ficam apenas como arquivos locais, nunca versionados
 .claude/docs/
