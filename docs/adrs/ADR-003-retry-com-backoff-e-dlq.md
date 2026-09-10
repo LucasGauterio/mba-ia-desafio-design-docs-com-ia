@@ -1,7 +1,7 @@
 # ADR-003: Retry com backoff exponencial (5 tentativas) e DLQ em tabela separada
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-001, ADR-002
 
 ## Contexto e problema
@@ -57,7 +57,10 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `src/middlewares/auth.middleware.ts` : `requireRole('ADMIN')` protege o endpoint de replay.
-- `prisma/schema.prisma` : onde `webhook_dead_letter` será definida.
-- `docs/adrs/ADR-002-worker-separado-em-polling.md` : o worker que aplica o retry.
-- `docs/FDD.md` : fluxo detalhado de retry e DLQ e a matriz de erros.
+- [`auth.middleware.ts`](../../src/middlewares/auth.middleware.ts#L49) : `requireRole`
+  protege o endpoint de replay (uso análogo ao de
+  [`user.routes.ts`](../../src/modules/users/user.routes.ts#L15)).
+- `webhook_dead_letter` e `webhook_outbox` são modelos novos, a serem definidos em
+  [`prisma/schema.prisma`](../../prisma/schema.prisma).
+- [ADR-002](ADR-002-worker-separado-em-polling.md) : o worker que aplica o retry.
+- [FDD](../FDD.md) : fluxo detalhado de retry e DLQ e a matriz de erros.

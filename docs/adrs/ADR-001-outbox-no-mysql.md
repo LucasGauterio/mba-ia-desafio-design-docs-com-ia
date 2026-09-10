@@ -1,15 +1,16 @@
 # ADR-001: Padrão Outbox no MySQL para os eventos de webhook
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-002, ADR-006, ADR-007
 
 ## Contexto e problema
 
 Três clientes B2B pediram para ser notificados quando o status de um pedido muda, em vez de
-fazer polling no `GET /orders`. O status do pedido só muda em `OrderService.changeStatus`
-(`src/modules/orders/order.service.ts`), que já roda uma transação pesada: atualiza
-`orders`, insere em `order_status_history` e ajusta `stockQuantity` dos produtos do pedido.
+fazer polling no `GET /orders`. O status do pedido só muda em
+[`OrderService.changeStatus`](../../src/modules/orders/order.service.ts#L126), que já roda
+uma transação pesada: atualiza `orders`, insere em `order_status_history` e ajusta
+`stockQuantity` dos produtos do pedido.
 
 A pergunta de arquitetura foi como disparar a notificação a partir dessa mudança de status.
 Duas forças em tensão: a notificação não pode acoplar a latência nem a disponibilidade da
@@ -55,8 +56,12 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `src/modules/orders/order.service.ts` : `OrderService.changeStatus`, onde a inserção na
-  outbox acontece dentro da `$transaction`.
-- `src/modules/orders/order.status.ts` : enum `OrderStatus`, base do filtro de eventos.
-- `prisma/schema.prisma` : onde os modelos `webhook_outbox` e correlatos serão definidos.
-- `docs/RFC.md` : proposta técnica consolidada.
+- [`order.service.ts`](../../src/modules/orders/order.service.ts#L131) : a inserção na
+  outbox acontece dentro da `$transaction` de `changeStatus`.
+- [`order.status.ts`](../../src/modules/orders/order.status.ts#L3) : mapa de transições;
+  [`prisma/schema.prisma`](../../prisma/schema.prisma#L16) define o enum `OrderStatus`,
+  base do filtro de eventos.
+- `webhook_outbox` e `webhook_dead_letter` são modelos novos, a serem definidos em
+  [`prisma/schema.prisma`](../../prisma/schema.prisma).
+- [RFC](../RFC.md) : proposta técnica consolidada.
+- [ADR-006](ADR-006-reuso-dos-padroes-do-projeto.md) : forma de integração e reuso de padrões.

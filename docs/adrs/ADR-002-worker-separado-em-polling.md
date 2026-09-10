@@ -1,7 +1,7 @@
 # ADR-002: Worker em processo separado, polling a cada 2 segundos
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-001, ADR-003, ADR-006
 
 ## Contexto e problema
@@ -12,8 +12,9 @@ como esse componente descobre que há eventos novos, e onde ele roda.
 
 Os clientes consideram "tempo real" qualquer coisa abaixo de 10 segundos. O MySQL não tem
 um mecanismo de notificação para processos externos equivalente ao `LISTEN/NOTIFY` do
-PostgreSQL. A API hoje roda como um único processo (`src/server.ts`); se o componente de
-envio rodasse dentro dela, um restart da API derrubaria o envio junto.
+PostgreSQL. A API hoje roda como um único processo
+([`src/server.ts`](../../src/server.ts#L6)); se o componente de envio rodasse dentro dela,
+um restart da API derrubaria o envio junto.
 
 ## Decisão
 
@@ -53,7 +54,11 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `src/server.ts` : padrão de bootstrap e shutdown que o `src/worker.ts` vai seguir.
-- `src/config/database.ts` : `PrismaClient` singleton; o worker instancia o seu próprio.
-- `src/modules/orders/order.status.ts` : enum `OrderStatus` usado na seleção de eventos.
-- `docs/adrs/ADR-003-retry-com-backoff-e-dlq.md` : o que o worker faz quando um envio falha.
+- [`src/server.ts`](../../src/server.ts#L6) : padrão de bootstrap e shutdown que o
+  `src/worker.ts` (novo) vai seguir.
+- [`src/config/database.ts`](../../src/config/database.ts#L10) : `PrismaClient` singleton do
+  servidor; o worker instancia o seu próprio.
+- [`order.status.ts`](../../src/modules/orders/order.status.ts#L12) : `canTransition` e o
+  enum `OrderStatus` usados na seleção de eventos.
+- [ADR-003](ADR-003-retry-com-backoff-e-dlq.md) : o que o worker faz quando um envio falha.
+- [FDD](../FDD.md) : fluxo detalhado do worker e do polling.

@@ -4,7 +4,7 @@
 |---|---|
 | Autor | Time de Plataforma / Pedidos |
 | Status | Em revisão |
-| Data | 2026-09-09 |
+| Data | 2026-09-10 |
 | Revisores | Larissa (Tech Lead), Marcos (Product Manager), Bruno (Engenheiro Pleno, time de Pedidos), Diego (Engenheiro Sênior, time de Plataforma), Sofia (Engenheira de Segurança) |
 
 ---
@@ -25,11 +25,11 @@ escalar para múltiplos workers no futuro.
 
 ## Contexto e problema
 
-O status de um pedido só muda em `OrderService.changeStatus`
-(`src/modules/orders/order.service.ts`), que já roda uma transação que atualiza `orders`,
-insere em `order_status_history` e ajusta o estoque dos produtos. O sistema não tem hoje
-nenhum mecanismo de notificação externa, evento, fila ou worker (`CLAUDE.md`, seção
-"Ausências").
+O status de um pedido só muda em
+[`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126), que já roda uma
+transação que atualiza `orders`, insere em `order_status_history` e ajusta o estoque dos
+produtos. O sistema não tem hoje nenhum mecanismo de notificação externa, evento, fila ou
+worker ([`CLAUDE.md`](../CLAUDE.md), seção "Ausências").
 
 Restrições reais que moldaram a proposta:
 
@@ -76,7 +76,8 @@ Visão de arquitetura, sem descer ao detalhe de implementação (esse fica no [F
 
 ### Disparo síncrono de HTTP dentro de `changeStatus`
 
-Chamar o endpoint do cliente diretamente no `OrderService.changeStatus`, dentro ou logo
+Chamar o endpoint do cliente diretamente no
+[`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126), dentro ou logo
 após a transação.
 
 **Trade-off que motivou o descarte:** um cliente lento travaria a mudança de status de
@@ -114,8 +115,9 @@ segundos já cabe folgado no requisito de 10 segundos.
 ## Impacto e riscos
 
 - **Impacto no código existente.** A única alteração de comportamento no fluxo atual é em
-  `OrderService.changeStatus`, que passa a publicar o evento na outbox dentro da transação
-  via uma função pura `publishWebhookEvent(tx, order, fromStatus, toStatus)`. O CRUD atual
+  [`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126), que passa a
+  publicar o evento na outbox dentro da transação via uma função pura
+  `publishWebhookEvent(tx, order, fromStatus, toStatus)`. O CRUD atual
   de pedidos, clientes e produtos não muda. Detalhe no [FDD](FDD.md), seção "Integração com
   o sistema existente".
 - **Novo processo em produção.** O worker é um segundo processo para operar, monitorar e
