@@ -35,3 +35,4 @@ Cada critério do `DESAFIO.md` tem uma reference que o suporta:
 | Tracker: formato e limiares | `documentation/tracker.md` |
 | README: seções, prompts, iterações | skill `design-docs-readme` |
 | Consistência: nada contradiz transcrição/código; nenhum arquivo inexistente citado | `rules/*` + skill `design-docs-validate` |
+| Navegação: referência a arquivo do repo é link relativo com âncora de linha | `rules/repo-file-links.md` + skill `design-docs-validate` |

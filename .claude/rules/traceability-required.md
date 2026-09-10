@@ -15,9 +15,11 @@ num documento sem **origem identificável** em uma das duas fontes:
   colchetes de timestamp nem "(Fulano, 09:17)" no texto. Quando ajudar a leitura, use
   atribuição natural, sem marcação: "discutido na reunião", "definido pela equipe de
   segurança", "decisão do time".
-- **Exceção**: caminhos de arquivo do código (`src/...`, `prisma/...`) **podem** aparecer
-  na prosa, porque são conteúdo técnico, não citação de fonte. A seção "Integração com o
-  sistema existente" do FDD e a seção "Referências" dos ADRs os usam normalmente.
+- **Exceção**: referências a arquivos do código (`src/...`, `prisma/...`) **podem** aparecer
+  na prosa, porque são conteúdo técnico de navegação, não citação de fonte. Quando
+  aparecem, seguem [`repo-file-links.md`](repo-file-links.md): link relativo, com âncora de
+  linha `#Lnn` quando citam um trecho específico. A seção "Integração com o sistema
+  existente" do FDD e a seção "Referências" dos ADRs os usam assim.
 
 ## Se você não consegue apontar a origem de um item
 

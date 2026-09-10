@@ -1,7 +1,7 @@
 # PRD: Order Management System, Sistema de Webhooks de Notificação de Pedidos
 
 Versão: 1.0
-Data: 2026-09-09
+Data: 2026-09-10
 Responsável: Marcos (Product Manager)
 Status: em revisão
 

@@ -20,8 +20,9 @@ Regras de estilo para **todos** os documentos do pacote.
   `.claude/rules/traceability-required.md`).
 - Quando ajudar a leitura, use atribuição natural, sem marcação: "discutido na reunião",
   "definido pela equipe de segurança", "decisão do time", "levantado e adiado".
-- **Caminhos de arquivo do código** (`src/...`, `prisma/...`) são conteúdo técnico e
-  **podem** aparecer na prosa normalmente.
+- **Referências a arquivos do código** (`src/...`, `prisma/...`) são conteúdo técnico e
+  **podem** aparecer na prosa. Quando aparecem, são **link relativo** com âncora de linha
+  `#Lnn` no trecho citado (ver `.claude/rules/repo-file-links.md`), nunca texto plano.
 
 ## Conteúdo
 

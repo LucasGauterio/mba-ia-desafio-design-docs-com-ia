@@ -41,7 +41,8 @@ Nome igual ao resultado da execução. Prefixo `design-docs-` agrupa tudo.
 ### Rules (`.claude/rules/`, sempre ativas)
 
 `source-code-is-read-only`, `traceability-required`, `no-cross-document-duplication`,
-`honor-rejected-scope`.
+`honor-rejected-scope`, `repo-file-links` (referência a arquivo do repo = link relativo
+com âncora de linha `#Lnn`).
 
 ### References (`.claude/references/`, guias de método autocontidos)
 
@@ -79,7 +80,7 @@ documento.
 2. **Guias de método.** Escrever `.claude/references/architecture/*`,
    `.claude/references/documentation/*`, `requirements/deliverables.default.md`,
    `guidelines/ai-as-maestro.md`, autocontidos.
-3. **Rules.** Os quatro arquivos de `.claude/rules/` e o wiring no `CLAUDE.md`.
+3. **Rules.** Os arquivos de `.claude/rules/` e o wiring no `CLAUDE.md`.
 4. **Análise de inputs.** Skills `design-docs-spec` e `design-docs-ledger`.
 5. **Autoria e orquestrador.** As sete skills de autoria e `design-docs` (retomável via
    `docs/_workbench/run-state.md`).

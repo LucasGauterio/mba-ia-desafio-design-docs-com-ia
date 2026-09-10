@@ -45,17 +45,20 @@ Pelo menos 2 momentos concretos em que a IA errou/ficou superficial e foi corrig
 (do "Log de ciclos de teste" em plan-progress.md). Quantos ciclos principais até o resultado.
 
 ## Como navegar a entrega
-Caminho dos arquivos e ordem sugerida de leitura:
-1. `CLAUDE.md`: contexto da aplicação
-2. `docs/PRD.md`: por quê e o quê
-3. `docs/RFC.md`: proposta técnica
-4. `docs/adrs/`: decisões
-5. `docs/FDD.md` (com a seção de diagramas ao fim): como implementar
-6. `docs/TRACKER.md`: rastreabilidade
-7. `DESIGN_DOCS_PROCESS.md`: o processo completo
+Ordem sugerida de leitura, cada arquivo como **link relativo a partir da raiz** (regra
+`repo-file-links.md`):
+1. [`CLAUDE.md`](CLAUDE.md): contexto da aplicação
+2. [`docs/PRD.md`](docs/PRD.md): por quê e o quê
+3. [`docs/RFC.md`](docs/RFC.md): proposta técnica
+4. [`docs/adrs/`](docs/adrs/): decisões
+5. [`docs/FDD.md`](docs/FDD.md) (com a seção de diagramas ao fim): como implementar
+6. [`docs/TRACKER.md`](docs/TRACKER.md): rastreabilidade
+7. [`DESIGN_DOCS_PROCESS.md`](DESIGN_DOCS_PROCESS.md): o processo completo
 ```
 
-Manter, se quiser, um link para o enunciado original (está em `DESAFIO.md`).
+Manter um link para o enunciado original ([`DESAFIO.md`](DESAFIO.md)). Toda menção a
+arquivo do repo no README (skills, docs, rules) é link relativo; o `README.md` fica na
+raiz, então os caminhos são diretos (`docs/...`, `.claude/...`).
 
 ## Checklist antes de concluir
 
@@ -63,5 +66,6 @@ Manter, se quiser, um link para o enunciado original (está em `DESAFIO.md`).
 - [ ] ≥ 1 ferramenta de IA listada com o papel.
 - [ ] ≥ 2 prompts customizados em blocos de código.
 - [ ] ≥ 2 iterações/ajustes concretos descritos.
-- [ ] Ordem de leitura com caminhos reais.
+- [ ] Ordem de leitura com caminhos reais, cada um link relativo que resolve.
+- [ ] Toda outra menção a arquivo do repo no corpo também é link relativo.
 - [ ] Atualizar a linha `readme` em `docs/_workbench/run-state.md`.

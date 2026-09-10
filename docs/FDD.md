@@ -1,7 +1,7 @@
 # FDD: Sistema de Webhooks de Notificação de Pedidos
 
 Versão: 1.0
-Data: 2026-09-09
+Data: 2026-09-10
 Responsável: Time de Plataforma / Pedidos
 
 Documento de implementação. As decisões estão fechadas nos ADRs
@@ -15,11 +15,12 @@ no [RFC](RFC.md). Este FDD não reabre decisões nem repete a justificativa de p
 ## 1. Contexto e motivação técnica
 
 Os clientes B2B precisam saber quando o status de um pedido muda sem fazer polling no
-`GET /orders`. O status só muda em `OrderService.changeStatus`
-(`src/modules/orders/order.service.ts`), dentro de uma `prisma.$transaction` que já
-atualiza `orders`, insere em `order_status_history` e ajusta o estoque.
+`GET /orders`. O status só muda em
+[`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126), dentro de uma
+`prisma.$transaction` que já atualiza `orders`, insere em `order_status_history` e ajusta o
+estoque.
 
-A feature adiciona: um módulo `src/modules/webhooks` para configurar endpoints de webhook,
+A feature adiciona: um módulo `src/modules/webhooks` (novo) para configurar endpoints de webhook,
 uma tabela outbox preenchida na mesma transação da mudança de status, um processo worker
 que faz a entrega HTTP com retry, e uma tabela de dead letter com replay administrativo.
 Atores: o **usuário autenticado** que gerencia a configuração de webhook pela API; o
@@ -123,9 +124,10 @@ seção 13.
 ## 5. Contratos públicos
 
 Base: `/api/v1`. Todos os endpoints de configuração exigem `Authorization: Bearer <jwt>`
-(`authenticate`); o de replay exige adicionalmente role `ADMIN` (`requireRole('ADMIN')`).
+([`authenticate`](../src/middlewares/auth.middleware.ts#L27)); o de replay exige
+adicionalmente role `ADMIN` ([`requireRole`](../src/middlewares/auth.middleware.ts#L49)).
 Formato de erro: `{ "error": { "code", "message", "details"? } }` (padrão do
-`src/middlewares/error.middleware.ts`).
+[`error.middleware.ts`](../src/middlewares/error.middleware.ts#L14)).
 
 ### 5.1 `POST /api/v1/webhooks`: cadastrar endpoint de webhook
 
@@ -163,7 +165,7 @@ A `secret` só aparece nesta resposta e na resposta de rotação; não é retorn
 Auth: usuário autenticado. Status: `200`, `400` (`VALIDATION_ERROR` se `customerId` ausente
 ou inválido).
 
-Response `200` (formato `paginated`, `src/shared/http/response.ts`):
+Response `200` (formato `paginated`, [`response.ts`](../src/shared/http/response.ts#L22)):
 ```json
 {
   "data": [
@@ -307,8 +309,8 @@ qualquer outra coisa conta como falha.
 
 ## 6. Matriz de erros previstos
 
-Todos os códigos do módulo usam o prefixo `WEBHOOK_` e herdam de `AppError`
-(`src/shared/errors/app-error.ts`).
+Todos os códigos do módulo usam o prefixo `WEBHOOK_` e herdam de
+[`AppError`](../src/shared/errors/app-error.ts#L3).
 
 ### 6.1 Erros da API HTTP
 
@@ -317,14 +319,14 @@ Todos os códigos do módulo usam o prefixo `WEBHOOK_` e herdam de `AppError`
 | `WEBHOOK_NOT_FOUND` | 404 | `:id` de webhook inexistente | resposta de erro padrão |
 | `WEBHOOK_INVALID_URL` | 400 | `url` não começa com `https://` | rejeitado no schema Zod |
 | `WEBHOOK_EMPTY_STATUS_FILTER` | 400 | `statusFilter` vazio | rejeitado no schema Zod |
-| `WEBHOOK_INVALID_STATUS_FILTER` | 400 | valor fora do enum `OrderStatus` | rejeitado no schema Zod contra `src/modules/orders/order.status.ts` |
+| `WEBHOOK_INVALID_STATUS_FILTER` | 400 | valor fora do enum `OrderStatus` | rejeitado no schema Zod contra [`order.status.ts`](../src/modules/orders/order.status.ts#L3) |
 | `WEBHOOK_CUSTOMER_NOT_FOUND` | 422 | `customerId` não existe em `customers` | `UnprocessableEntityError` no service |
 | `WEBHOOK_DUPLICATE_URL` | 409 | já existe endpoint ativo com a mesma `url` para o mesmo `customerId` | `ConflictError` no service |
 | `WEBHOOK_INACTIVE` | 409 | rotacionar secret de endpoint `active = false` | `ConflictError` no service |
 | `WEBHOOK_SECRET_REQUIRED` | 400 | verificação interna: tentativa de envio sem secret vigente | não deveria ocorrer; logado em `ERROR` e o evento vai para retry |
 | `WEBHOOK_DEAD_LETTER_NOT_FOUND` | 404 | `:id` de item de DLQ inexistente | resposta de erro padrão |
 | `WEBHOOK_ALREADY_REPLAYED` | 409 | replay pedido para item que já tem evento pendente originado de replay | `ConflictError` no service |
-| `FORBIDDEN` | 403 | replay chamado por usuário sem role `ADMIN` | tratado por `requireRole('ADMIN')` (erro já existente) |
+| `FORBIDDEN` | 403 | replay chamado por usuário sem role `ADMIN` | tratado por [`requireRole`](../src/middlewares/auth.middleware.ts#L49) (erro já existente) |
 
 ### 6.2 Erros de processamento no worker (não são respostas HTTP; viram estado mais log mais métrica)
 
@@ -360,7 +362,8 @@ Todos os códigos do módulo usam o prefixo `WEBHOOK_` e herdam de `AppError`
 
 ## 8. Observabilidade
 
-Reusa o `logger` Pino existente (`src/shared/logger/index.ts`), sem nada novo.
+Reusa o `logger` Pino existente ([`logger/index.ts`](../src/shared/logger/index.ts#L32)),
+sem nada novo.
 
 **Métricas** (contadores e histogramas expostos pelo worker e pela API):
 
@@ -379,8 +382,9 @@ Reusa o `logger` Pino existente (`src/shared/logger/index.ts`), sem nada novo.
 - `webhook_replay_requested`: `{ deadLetterId, newOutboxEventId, replayedBy }`.
 - Erros de envio em nível `WARN`; erros internos (secret ausente, payload grande) em `ERROR`.
 
-**Tracing / correlação:** o `X-Request-Id` do `requestLogger`
-(`src/middlewares/request-logger.middleware.ts`) que originou a mudança de status é copiado
+**Tracing / correlação:** o `X-Request-Id` do
+[`requestLogger`](../src/middlewares/request-logger.middleware.ts#L5) que originou a mudança
+de status é copiado
 para a linha da outbox e propagado nos logs de entrega, ligando a requisição
 `PATCH /orders/:id/status` ao envio do webhook. O `eventId` correlaciona a linha da outbox,
 as linhas de `webhook_delivery` e, se aplicável, a linha da DLQ.
@@ -389,7 +393,7 @@ as linhas de `webhook_delivery` e, se aplicável, a linha da DLQ.
 
 | Componente | Versão mínima | Observação |
 |---|---|---|
-| Node.js | 20 | mesma do projeto (`package.json` `engines`) |
+| Node.js | 20 | mesma do projeto ([`package.json`](../package.json#L7), `engines`) |
 | Prisma | 5.22 | modelos novos na mesma `schema.prisma`; migration via `prisma migrate dev` |
 | MySQL | 8 | outbox e DLQ como tabelas InnoDB; índices em `(status, next_attempt_at)` e `created_at` |
 | Cliente HTTP de saída | a definir na implementação | o projeto não tem um cliente HTTP padronizado hoje; a escolha vira convenção do módulo ([ADR-006](adrs/ADR-006-reuso-dos-padroes-do-projeto.md)) |
@@ -399,8 +403,8 @@ Compatibilidade:
 - Os contratos HTTP existentes (`/auth`, `/users`, `/customers`, `/products`, `/orders`)
   **não mudam**. `PATCH /orders/:id/status` ganha o efeito colateral de publicar eventos,
   mas a request e a response permanecem idênticas.
-- O middleware de erro central (`src/middlewares/error.middleware.ts`) trata os erros
-  `WEBHOOK_*` sem alteração, porque herdam de `AppError`.
+- O middleware de erro central ([`error.middleware.ts`](../src/middlewares/error.middleware.ts#L14))
+  trata os erros `WEBHOOK_*` sem alteração, porque herdam de `AppError`.
 - O worker é um processo adicional; não afeta o deploy da API além de exigir um segundo
   serviço rodando `npm run worker`.
 
@@ -465,84 +469,96 @@ Compatibilidade:
 ## 12. Integração com o sistema existente
 
 Esta seção nomeia os arquivos reais do código base e descreve a integração de cada. Ver
-`.claude/references/codebase/integration-points.md`.
+[`integration-points.md`](../.claude/references/codebase/integration-points.md).
 
-### `src/modules/orders/order.service.ts`
+### [`src/modules/orders/order.service.ts`](../src/modules/orders/order.service.ts#L126)
 
-`OrderService.changeStatus` roda a mudança de status dentro de `prisma.$transaction`. A
+[`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126) roda a mudança de
+status dentro de [`prisma.$transaction`](../src/modules/orders/order.service.ts#L131). A
 integração adiciona **uma chamada** ao final desse bloco, ainda dentro do `tx`:
 `await publishWebhookEvent(tx, refreshed, from, to)`. `publishWebhookEvent` é uma **função
-pura** que recebe o `Prisma.TransactionClient`, não um repository injetado. Ela lê
-`webhook_endpoint` e escreve `webhook_outbox` usando o mesmo `tx`, de modo que a inserção
-dos eventos é atômica com a mudança de status. Se ela lançar, o `$transaction` reverte
-tudo, inclusive `order.update` e `orderStatusHistory.create`.
+pura** (arquivo novo em `src/modules/webhooks/`) que recebe o `Prisma.TransactionClient`,
+não um repository injetado. Ela lê `webhook_endpoint` e escreve `webhook_outbox` usando o
+mesmo `tx`, de modo que a inserção dos eventos é atômica com a mudança de status. Se ela
+lançar, o `$transaction` reverte tudo, inclusive o `order.update` e o
+`orderStatusHistory.create`.
 
-### `src/modules/orders/order.status.ts`
+### [`src/modules/orders/order.status.ts`](../src/modules/orders/order.status.ts#L3)
 
-O enum `OrderStatus` e nada mais. O schema Zod de `statusFilter` (no módulo de webhooks)
-valida cada valor contra esse enum via `z.nativeEnum(OrderStatus)`, exatamente como
-`src/modules/orders/order.schemas.ts` já faz em `updateOrderStatusSchema`. O filtro de
-interesse do endpoint compara `toStatus` da transição com a lista `statusFilter`.
+O enum `OrderStatus` e o mapa de transições. O schema Zod de `statusFilter` (no módulo de
+webhooks) valida cada valor contra esse enum via `z.nativeEnum(OrderStatus)`, exatamente
+como [`order.schemas.ts`](../src/modules/orders/order.schemas.ts#L18) já faz em
+`updateOrderStatusSchema`. O filtro de interesse do endpoint compara `toStatus` da
+transição com a lista `statusFilter`.
 
-### `src/shared/errors/app-error.ts` e `src/shared/errors/http-errors.ts`
+### [`src/shared/errors/app-error.ts`](../src/shared/errors/app-error.ts#L3) e [`http-errors.ts`](../src/shared/errors/http-errors.ts#L3)
 
-As classes de erro do módulo de webhooks herdam de `AppError` ou reusam
-`ConflictError` / `UnprocessableEntityError` / `NotFoundError` com um `code` próprio
-prefixado `WEBHOOK_` (por exemplo, `class WebhookNotFoundError extends NotFoundError` com
-`code = 'WEBHOOK_NOT_FOUND'`). Seguem o padrão de `InvalidStatusTransitionError` e
-`InsufficientStockError`, que já são subclasses especializadas.
+As classes de erro do módulo de webhooks herdam de
+[`AppError`](../src/shared/errors/app-error.ts#L3) ou reusam
+[`ConflictError`](../src/shared/errors/http-errors.ts#L33) /
+[`UnprocessableEntityError`](../src/shared/errors/http-errors.ts#L39) /
+[`NotFoundError`](../src/shared/errors/http-errors.ts#L27) com um `code` próprio prefixado
+`WEBHOOK_` (por exemplo, `class WebhookNotFoundError extends NotFoundError` com
+`code = 'WEBHOOK_NOT_FOUND'`). Seguem o padrão de
+[`InvalidStatusTransitionError`](../src/shared/errors/http-errors.ts#L45) e
+[`InsufficientStockError`](../src/shared/errors/http-errors.ts#L55), que já são subclasses
+especializadas.
 
-### `src/middlewares/error.middleware.ts`
+### [`src/middlewares/error.middleware.ts`](../src/middlewares/error.middleware.ts#L14)
 
 **Nenhuma alteração.** O middleware já serializa qualquer `AppError` para
 `{ error: { code, message, details? } }` e já trata `ZodError` (usado pelos schemas de
 webhook) e `Prisma.PrismaClientKnownRequestError` (P2002 cobre a constraint única de `url`
 por customer, se a implementação optar por delegar ao banco em vez de checar no service).
 
-### `src/middlewares/auth.middleware.ts`
+### [`src/middlewares/auth.middleware.ts`](../src/middlewares/auth.middleware.ts#L27)
 
-As rotas de configuração de webhook usam `authenticate` no router, como
-`src/modules/customers/customer.routes.ts`. A rota de replay de DLQ encadeia
-`authenticate` e `requireRole('ADMIN')`, exatamente como
-`src/modules/users/user.routes.ts` faz em `GET /users/:id`. O `replayedBy` do log vem de
-`req.user.id`.
+As rotas de configuração de webhook usam
+[`authenticate`](../src/middlewares/auth.middleware.ts#L27) no router, como
+[`customer.routes.ts`](../src/modules/customers/customer.routes.ts#L14). A rota de replay de
+DLQ encadeia `authenticate` e
+[`requireRole('ADMIN')`](../src/middlewares/auth.middleware.ts#L49), exatamente como
+[`user.routes.ts`](../src/modules/users/user.routes.ts#L15) faz em `GET /users/:id`. O
+`replayedBy` do log vem de `req.user.id`.
 
-### `src/middlewares/validate.middleware.ts`
+### [`src/middlewares/validate.middleware.ts`](../src/middlewares/validate.middleware.ts#L11)
 
 Os schemas Zod de criação e edição de webhook são passados a `validate({ body, params, query })`
 no router, como nos outros módulos. A regra "URL tem que ser https" é um `.refine()` no
 schema, não lógica de service.
 
-### `src/config/database.ts`
+### [`src/config/database.ts`](../src/config/database.ts#L10)
 
 Exporta o singleton `prisma` usado pela API. O worker **não** importa esse singleton: ele
-instancia o **próprio** `PrismaClient` em `src/worker.ts`, com a mesma `DATABASE_URL`,
-porque `PrismaClient` é por processo. O padrão de criação é o mesmo de
-`createPrismaClient()`.
+instancia o **próprio** `PrismaClient` em `src/worker.ts` (novo), com a mesma
+`DATABASE_URL`, porque `PrismaClient` é por processo. O padrão de criação é o mesmo de
+[`createPrismaClient()`](../src/config/database.ts#L4).
 
-### `src/server.ts`
+### [`src/server.ts`](../src/server.ts#L6)
 
 Modelo para o novo entrypoint `src/worker.ts`: bootstrap assíncrono, tratamento de
 `SIGINT` / `SIGTERM` para encerrar o loop de polling de forma limpa e `prisma.$disconnect()`
 no shutdown. Um script `"worker": "tsx watch --env-file=.env src/worker.ts"` (e o
-equivalente de produção) entra no `package.json`.
+equivalente de produção) entra no [`package.json`](../package.json#L10).
 
-### `src/app.ts`
+### [`src/app.ts`](../src/app.ts#L26)
 
-`buildControllers(prisma)` instancia o `WebhookController` (repository, depois service,
-depois controller) e o adiciona ao objeto `Controllers`. `buildApiRouter` monta
+[`buildControllers(prisma)`](../src/app.ts#L26) instancia o `WebhookController` (repository,
+depois service, depois controller) e o adiciona ao objeto `Controllers`.
+[`buildApiRouter`](../src/routes/index.ts#L21) monta
 `router.use('/webhooks', buildWebhookRouter(controllers.webhooks))` e
 `router.use('/admin/webhooks', buildWebhookAdminRouter(controllers.webhooks))`, seguindo o
-padrão de `src/routes/index.ts`.
+padrão de [`routes/index.ts`](../src/routes/index.ts#L21).
 
-### `src/shared/logger/index.ts`
+### [`src/shared/logger/index.ts`](../src/shared/logger/index.ts#L32)
 
 O `logger` Pino é importado tanto pela API quanto pelo worker. Os eventos nomeados de §8
 seguem o estilo `snake_case` com objeto de contexto primeiro, como `http_request` e
-`server_started`. A lista de `redactPaths` já cobre `*.token` e `authorization`; a
-implementação deve garantir que `secret` e o corpo assinado nunca entrem em um campo logado.
+`server_started`. A lista de [`redactPaths`](../src/shared/logger/index.ts#L4) já cobre
+`*.token` e `authorization`; a implementação deve garantir que `secret` e o corpo assinado
+nunca entrem em um campo logado.
 
-### `prisma/schema.prisma`
+### [`prisma/schema.prisma`](../prisma/schema.prisma)
 
 Quatro modelos novos, com as convenções do arquivo (PK `String @id @default(uuid())
 @db.Char(36)`, `@@map` snake_case plural, timestamps, `@@index` nos campos de filtro):
@@ -562,8 +578,10 @@ introduz elemento que não esteja no corpo do FDD.
 ### 13.1 Publicação do evento na transação de mudança de status
 
 Mostra o caminho feliz da criação do evento (seção 4.1). A chamada de
-`PATCH /orders/:id/status` entra em `OrderService.changeStatus`, que já roda uma transação;
-a novidade é a chamada a `publishWebhookEvent` ainda dentro do mesmo `tx`, que consulta os
+`PATCH /orders/:id/status` entra em
+[`OrderService.changeStatus`](../src/modules/orders/order.service.ts#L126), que já roda uma
+transação; a novidade é a chamada a `publishWebhookEvent` ainda dentro do mesmo `tx`, que
+consulta os
 endpoints interessados e insere uma linha por endpoint na outbox. É o diagrama central para
 entender a garantia de atomicidade entre a mudança de status e o registro do evento.
 

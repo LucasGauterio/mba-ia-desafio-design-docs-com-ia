@@ -57,7 +57,8 @@ Não alterar `src/`, `prisma/`, `tests/`, configs. `TRANSCRICAO.md` não muda.
 - [ ] "Contratos públicos": ≥ 4 endpoints HTTP com payload de exemplo (request e response)
       e status codes.
 - [ ] Matriz de erros usa códigos com prefixo `WEBHOOK_`.
-- [ ] "Integração com o sistema existente": ≥ 4 caminhos de arquivo reais do código base.
+- [ ] "Integração com o sistema existente": ≥ 4 arquivos reais do código base, cada um como
+      link relativo com âncora de linha (`#Lnn`).
 - [ ] "Observabilidade": cita métricas, logs e tracing.
 - [ ] Seção final "Diagramas": 4 a 10 diagramas Mermaid embutidos, cada um apontando a
       seção que ilustra; sem arquivo `docs/diagrams/` separado.
@@ -76,6 +77,8 @@ Não alterar `src/`, `prisma/`, `tests/`, configs. `TRANSCRICAO.md` não muda.
 - [ ] ≥ 80% dos itens identificáveis dos documentos têm linha correspondente.
 - [ ] ≥ 70% das linhas têm Fonte = TRANSCRICAO com timestamp válido `[hh:mm] Nome`.
 - [ ] ≥ 5 linhas têm Fonte = CODIGO com caminho de arquivo real.
+- [ ] Toda célula `Documento` e `Localização` é link relativo que resolve; linhas
+      TRANSCRICAO com âncora `#Lnn` da fala, linhas CODIGO com `#Lnn` do símbolo citado.
 
 ### README `README.md`
 - [ ] Contém: Sobre o desafio; Ferramentas de IA utilizadas; Workflow adotado; Prompts
@@ -86,6 +89,10 @@ Não alterar `src/`, `prisma/`, `tests/`, configs. `TRANSCRICAO.md` não muda.
 ### Consistência geral
 - [ ] Nenhum requisito/decisão/restrição contradiz a transcrição ou o código.
 - [ ] Nenhum arquivo de código mencionado nos documentos é inexistente no repositório.
+- [ ] Toda referência a um arquivo real do repo (em qualquer entregável) é link relativo;
+      código citando um trecho leva âncora de linha `#Lnn`; nenhum link quebrado; nada em
+      texto plano (ver `.claude/rules/repo-file-links.md`). Caminhos que a feature ainda vai
+      criar ficam como `code span`.
 - [ ] PRD, RFC, FDD e ADRs têm prosa limpa: nenhum `[hh:mm]` nem citação de fonte no corpo
       (rastreabilidade só no `docs/TRACKER.md`).
 - [ ] Nenhum travessão longo (em-dash) nos documentos.

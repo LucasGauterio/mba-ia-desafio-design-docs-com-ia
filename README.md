@@ -114,7 +114,7 @@ gerado no baseline:
 
 ## Iterações e ajustes
 
-Foram cerca de 9 ciclos principais. Os momentos concretos de correção:
+Foram cerca de 10 ciclos principais. Os momentos concretos de correção:
 
 1. **O plano do workflow passou por várias revisões antes de qualquer geração.** A primeira
    versão criava uma pasta `scripts/` de shell no repositório e usava um prefixo curto
@@ -167,6 +167,16 @@ Foram cerca de 9 ciclos principais. Os momentos concretos de correção:
 9. **Os diagramas estavam num arquivo `docs/diagrams/webhooks-diagrams.md` à parte**, o que
    também não constava da estrutura do `DESAFIO.md`. Foram movidos para uma seção embutida
    no fim do `docs/FDD.md` ("13. Diagramas"), cada um apontando a seção do FDD que ilustra.
+
+10. **As referências a arquivos do repositório estavam em texto plano**, no Tracker (colunas
+    "Documento" e "Localização") e na prosa técnica do FDD e dos ADRs, o que dificultava
+    conferir cada item. Nova regra do workflow: toda menção a um arquivo que existe no
+    repositório é link relativo em Markdown, e quando cita um trecho específico leva âncora
+    de linha (por exemplo `#L126`). No Tracker, a origem na transcrição virou um link para
+    a linha exata da fala em `TRANSCRICAO.md`. Os caminhos que a
+    feature ainda vai criar (`src/worker.ts`, `src/modules/webhooks/`) continuam como texto
+    de código, sem link. O workflow foi rodado de novo por inteiro para regerar tudo sob a
+    regra nova; a validação passou em 38 de 38 critérios.
 
 ## Como navegar a entrega
 

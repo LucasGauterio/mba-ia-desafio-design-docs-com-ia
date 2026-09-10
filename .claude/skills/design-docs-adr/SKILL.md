@@ -28,11 +28,16 @@ description: >-
 4. Escrever cada ADR no formato MADR de 7 seções (ver reference). Header só Status/Data/
    Decisões relacionadas. Sem trechos de código. ≤ 5 referências de arquivo. 100-250 linhas.
 5. No ADR de "reuso dos padrões existentes" (candidato natural), referenciar explicitamente
-   `src/shared/errors/`, `src/shared/logger/index.ts`, `src/modules/orders/order.service.ts`,
-   `src/app.ts`. **Pelo menos 1 ADR** precisa citar o código real.
-6. **Prosa limpa: nenhum ADR contém `[hh:mm]` nem colchetes de timestamp.** A origem de
+   `src/shared/errors/app-error.ts`, `src/shared/logger/index.ts`,
+   `src/modules/orders/order.service.ts`, `src/app.ts`. **Pelo menos 1 ADR** precisa citar
+   o código real.
+6. **Links de arquivo (regra `repo-file-links.md`):** na seção "Referências" e em qualquer
+   menção a arquivo real, usar **link relativo a partir de `docs/adrs/`** (`../../src/...`)
+   com **âncora de linha `#Lnn`** do símbolo. Links para o RFC = `../RFC.md`; para outro
+   ADR = `ADR-00X-....md`. Não linkar caminho que ainda não existe.
+7. **Prosa limpa: nenhum ADR contém `[hh:mm]` nem colchetes de timestamp.** A origem de
    cada afirmação vai para `docs/TRACKER.md` (gerado depois por `design-docs-tracker`).
-7. Atualizar a linha `adr` em `docs/_workbench/run-state.md`.
+8. Atualizar a linha `adr` em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -46,7 +51,7 @@ description: >-
       Consequências (positivas **e** negativas com trade-off), Referências.
 - [ ] Conjunto cobre ≥ 5 das 6 decisões principais.
 - [ ] ≥ 1 ADR referencia arquivos/módulos/classes do código.
-- [ ] Sem trechos de código; ≤ 5 referências por ADR.
+- [ ] Sem trechos de código; ≤ 5 referências por ADR, cada uma link relativo com `#Lnn` que resolve.
 - [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
 - [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Nenhuma decisão inventada; nenhum item descartado/adiado como decisão.

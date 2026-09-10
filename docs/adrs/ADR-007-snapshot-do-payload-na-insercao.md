@@ -1,7 +1,7 @@
 # ADR-007: Snapshot do payload renderizado na inserção da outbox
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-001, ADR-005
 
 ## Contexto e problema
@@ -47,7 +47,9 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `src/modules/orders/order.service.ts` : a renderização do snapshot ocorre na publicação
-  do evento, dentro da transação de `changeStatus`.
-- `prisma/schema.prisma` : coluna de payload em `webhook_outbox`.
-- `docs/FDD.md` : formato completo do payload e a matriz de erros (`WEBHOOK_PAYLOAD_TOO_LARGE`).
+- [`order.service.ts`](../../src/modules/orders/order.service.ts#L131) : a renderização do
+  snapshot ocorre na publicação do evento, dentro da `$transaction` de `changeStatus`.
+- A coluna de payload fica em `webhook_outbox`, modelo novo em
+  [`prisma/schema.prisma`](../../prisma/schema.prisma).
+- [ADR-001](ADR-001-outbox-no-mysql.md) : a outbox onde o snapshot é gravado.
+- [FDD](../FDD.md) : formato completo do payload e a matriz de erros (`WEBHOOK_PAYLOAD_TOO_LARGE`).

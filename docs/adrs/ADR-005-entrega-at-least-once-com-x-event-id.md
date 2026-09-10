@@ -1,7 +1,7 @@
 # ADR-005: Entrega at-least-once com dedupe do lado do cliente via X-Event-Id
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-001, ADR-003, ADR-004
 
 ## Contexto e problema
@@ -48,6 +48,8 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `prisma/schema.prisma` : `webhook_outbox` com `id` UUID usado também como `event_id`.
-- `docs/adrs/ADR-003-retry-com-backoff-e-dlq.md` : o retry que gera as duplicatas.
-- `docs/FDD.md` : semântica do header `X-Event-Id` e o formato do payload.
+- `webhook_outbox` (modelo novo) terá `id` UUID usado também como `event_id`, seguindo o
+  padrão de PKs `@db.Char(36)` de [`prisma/schema.prisma`](../../prisma/schema.prisma#L16).
+- [ADR-003](ADR-003-retry-com-backoff-e-dlq.md) : o retry que gera as duplicatas.
+- [ADR-006](ADR-006-reuso-dos-padroes-do-projeto.md) : decisão de usar UUID como identificador.
+- [FDD](../FDD.md) : semântica do header `X-Event-Id` e o formato do payload.

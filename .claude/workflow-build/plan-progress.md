@@ -17,7 +17,7 @@
       `requirements/deliverables.default.md`, `guidelines/ai-as-maestro.md`,
       `references/INDEX.md`.
 - [x] 3. Rules: `source-code-is-read-only`, `traceability-required`,
-      `no-cross-document-duplication`, `honor-rejected-scope` + wiring no `CLAUDE.md`.
+      `no-cross-document-duplication`, `honor-rejected-scope`, `repo-file-links` + wiring no `CLAUDE.md`.
 - [x] 4. Análise de inputs: `design-docs-spec`, `design-docs-ledger`.
 - [x] 5. Autoria: `design-docs-adr`, `-rfc`, `-fdd`, `-diagrams`, `-prd`, `-tracker`,
       `-readme`; orquestrador `design-docs` retomável via `docs/_workbench/run-state.md`.
@@ -49,5 +49,10 @@
 8. Diagramas deixaram de ser um arquivo `docs/diagrams/<feature>-diagrams.md` separado e
    passaram a ser a última seção embutida do `docs/FDD.md` ("13. Diagramas"). A skill
    `design-docs-diagrams` passou a ser dona dessa seção.
+9. `docs/TRACKER.md` (e as demais referências a arquivo do repo) estava em texto plano,
+   dificultando a validação. Nova rule `repo-file-links.md`: toda referência a arquivo do
+   repo é link relativo, com âncora de linha `#Lnn` quando cita um trecho. Skills de
+   autoria, `design-docs-validate` e o perfil de entregáveis atualizados. Orquestrador
+   ganhou o modo `--nao-interativo` (não para nos checkpoints ao rodar via `claude -p`).
 
 Detalhe completo na seção "Iterações e ajustes" do `README.md`.

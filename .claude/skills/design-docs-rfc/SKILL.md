@@ -33,9 +33,13 @@ description: >-
 6. Questões em aberto: ≥ 2 do ledger ("Adiados"): ex.: rate limiting de saída; escalar
    para múltiplos workers.
 7. Impacto e riscos: resumo do impacto nos sistemas existentes + riscos de arquitetura.
-8. Decisões relacionadas: link relativo para ≥ 2 ADRs (idealmente todos).
-9. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp.** A origem vai para o Tracker.
-10. Manter em 2 a 4 páginas. Atualizar a linha `rfc` em `docs/_workbench/run-state.md`.
+8. Decisões relacionadas: link relativo para ≥ 2 ADRs (`adrs/ADR-00X-....md`), idealmente todos.
+9. **Links de arquivo (regra `repo-file-links.md`):** se o RFC mencionar um arquivo real do
+   repo (ex.: `src/modules/orders/order.service.ts` no contexto), usar link relativo a
+   partir de `docs/` (`../src/...`) com âncora de linha `#Lnn`. `src/worker.ts` e o módulo
+   novo ficam como `code span`.
+10. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp.** A origem vai para o Tracker.
+11. Manter em 2 a 4 páginas. Atualizar a linha `rfc` em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -49,6 +53,7 @@ description: >-
 - [ ] ≥ 2 alternativas descartadas, cada uma com o trade-off que motivou o descarte.
 - [ ] ≥ 2 questões em aberto adiadas na reunião.
 - [ ] ≥ 2 links de ADR (relativos, válidos).
+- [ ] Toda menção a arquivo real do repo é link relativo com `#Lnn`; nenhum link quebrado.
 - [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
 - [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] 2 a 4 páginas; nenhum detalhe de implementação do FDD.

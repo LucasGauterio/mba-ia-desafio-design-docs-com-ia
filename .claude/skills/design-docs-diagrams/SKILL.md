@@ -32,7 +32,10 @@ Os diagramas ficam **embutidos no FDD**, não num arquivo separado. Esta skill �
    ```mermaid e um bloco **Notas:**.
 4. Respeitar os guardrails de sintaxe Mermaid (IDs ASCII, labels ≤ 3 palavras, `<br/>`,
    sem `min(`/`++`/`{}` em labels, sequence vs flowchart não se misturam, sem emoji).
-5. Texto em PT com acentos; termos técnicos em inglês.
+5. Texto em PT com acentos; termos técnicos em inglês. Dentro de bloco ```mermaid não há
+   link; mas se o **parágrafo descritivo** ou as **Notas:** citarem um arquivo real do
+   repo, é link relativo a partir de `docs/` (`../src/...`) com `#Lnn` (regra
+   `repo-file-links.md`).
 6. Acrescentar, na seção de fluxos do FDD, uma frase curta apontando para a seção de
    diagramas (se ainda não existir).
 7. Revisão interna: reler FDD inteiro, corrigir inconsistências e elementos inventados.

@@ -1,7 +1,7 @@
 # ADR-004: Assinatura HMAC-SHA256 com secret única por endpoint
 
 **Status:** Aceito
-**Data:** 2026-09-09
+**Data:** 2026-09-10
 **Decisões relacionadas:** ADR-005
 
 ## Contexto e problema
@@ -57,8 +57,9 @@ Negativas e limitações aceitas:
 
 ## Referências
 
-- `src/middlewares/validate.middleware.ts` : validação Zod da `url` (https obrigatório) e
-  dos demais campos.
-- `prisma/schema.prisma` : modelo de configuração de webhook (`url`, `secret`,
-  `customer_id`, ativo).
-- `docs/FDD.md` : semântica dos headers `X-Signature` e `X-Timestamp` e a matriz de erros.
+- [`validate.middleware.ts`](../../src/middlewares/validate.middleware.ts#L11) : `validate()`
+  roda os schemas Zod; a exigência de `https` na `url` é um `.refine()` nesse padrão.
+- O modelo de configuração de webhook (`url`, `secret`, `customer_id`, ativo) é novo, a ser
+  definido em [`prisma/schema.prisma`](../../prisma/schema.prisma).
+- [ADR-005](ADR-005-entrega-at-least-once-com-x-event-id.md) : os demais headers do contrato.
+- [FDD](../FDD.md) : semântica dos headers `X-Signature` e `X-Timestamp` e a matriz de erros.
