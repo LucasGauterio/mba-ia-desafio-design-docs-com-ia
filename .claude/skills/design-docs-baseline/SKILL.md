@@ -25,7 +25,12 @@ para todas as etapas seguintes do workflow.
 2. **Nada de feature nova.** O baseline descreve o sistema como ele é hoje. Se um mecanismo
    não existe no código (fila, evento, webhook, cache...), registre isso como **ausência
    observada**, não como algo a construir.
-3. **Rastreável.** Toda afirmação relevante aponta para um caminho de arquivo real.
+3. **Rastreável, com link.** Toda afirmação relevante aponta para um arquivo real, e a
+   referência é um **link relativo** (regra `repo-file-links.md`): a partir de `CLAUDE.md`
+   o caminho é `src/...`; a partir de `.claude/references/codebase/` é `../../../src/...`.
+   Quando a afirmação cita um símbolo (função, classe, middleware, model, campo), o link
+   leva **âncora de linha `#Lnn`** da declaração; referência ao arquivo como um todo pode
+   ir sem âncora.
 4. **Não altere código.** Só cria/atualiza os três arquivos de saída abaixo.
 
 ## Passos
@@ -59,9 +64,14 @@ Seções sugeridas:
 - **Entrypoints e execução**: como rodar, migrar, semear, testar.
 - **Ausências**: o que o sistema deliberadamente ainda não tem.
 - **Regras para o agente**: não editar `src/`, `prisma/`, `tests/`, configs; a entrega
-  deste repositório é documental. Referência às rules em `.claude/rules/`.
+  deste repositório é documental. Referência às rules em `.claude/rules/` (uma linha por
+  rule, com link relativo).
 
 Não incluir: roadmap, features futuras, nada derivado do desafio.
+
+Referências a arquivo neste `CLAUDE.md`: link relativo (`[\`src/app.ts\`](src/app.ts)`),
+com `#Lnn` quando a linha cita um símbolo. A tabela/árvore de estrutura pode usar
+`code span` simples para não virar uma parede de links; o resto do texto linka.
 
 ### 2. `.claude/references/codebase/existing-app.md`
 
@@ -69,14 +79,18 @@ Mapa detalhado, mais longo que o `CLAUDE.md`, para consulta durante a autoria do
 entrypoints com caminho, wiring de DI, tabela de módulos (arquivos e responsabilidade),
 modelo de dados por entidade, máquina(s) de estado, fluxos transacionais críticos,
 middlewares na ordem, classes de erro e seus códigos/status, formato de log, testes.
+Cada caminho de arquivo é link relativo a partir de `.claude/references/codebase/`
+(`../../../src/...`), com âncora `#Lnn` no símbolo citado.
 
 ### 3. `.claude/references/codebase/integration-points.md`
 
 Catálogo dos **pontos de extensão** que uma feature nova provavelmente vai tocar, cada um
-com: caminho do arquivo, o que faz hoje, como uma feature se conectaria, cuidado/risco.
-Exemplos de categorias: métodos de serviço transacionais, middlewares, classes de erro
-reutilizáveis, máquina de estados, entrypoints novos, cliente de banco por processo.
-Esta é a matéria-prima da seção "Integração com o sistema existente" do FDD.
+com: **link relativo com âncora de linha** para o arquivo/símbolo (`#Lnn`), o que faz hoje,
+como uma feature se conectaria, cuidado/risco. Exemplos de categorias: métodos de serviço
+transacionais, middlewares, classes de erro reutilizáveis, máquina de estados, entrypoints
+novos, cliente de banco por processo. Esta é a matéria-prima da seção "Integração com o
+sistema existente" do FDD, então os links já vêm prontos para reaproveitar (ajustando o
+prefixo relativo de `../../../src/...` para `../src/...`).
 
 ## Conclusão
 

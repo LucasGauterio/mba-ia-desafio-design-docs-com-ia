@@ -35,16 +35,20 @@ description: >-
 4. **Fluxos (seção 4):** outbox (inserção dentro da `$transaction` de `changeStatus`),
    worker (polling 2 s), retry (5 tentativas, 1m/5m/30m/2h/12h), DLQ (tabela separada, replay).
 5. **Observabilidade (seção 8):** métricas **e** logs **e** tracing/correlação.
-6. **Integração com o sistema existente (seção 12):** nomear **≥ 4 caminhos de arquivo
-   reais** e descrever a integração de cada. Usar os PE do `integration-points.md`. Cobrir
-   pelo menos `src/modules/orders/order.service.ts`, `src/shared/errors/*`,
+6. **Integração com o sistema existente (seção 12):** nomear **≥ 4 arquivos reais** e
+   descrever a integração de cada. Usar os PE do `integration-points.md`. Cobrir pelo menos
+   `src/modules/orders/order.service.ts`, `src/shared/errors/app-error.ts`,
    `src/middlewares/auth.middleware.ts`, `src/config/database.ts` (worker com Prisma próprio).
-7. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp** em nenhuma seção. Caminhos de
-   arquivo do código (`src/...`, `prisma/...`) são conteúdo técnico e aparecem normalmente.
-   A origem de cada afirmação vai para o Tracker.
-8. Ao terminar o texto, **invocar `design-docs-diagrams`** para acrescentar a seção
+7. **Links de arquivo (regra `repo-file-links.md`):** toda menção a um arquivo real do repo,
+   em qualquer seção, é **link relativo a partir de `docs/`** (`../src/...`), com **âncora
+   de linha `#Lnn`** no símbolo citado. Abrir o arquivo e pegar a linha real. Arquivos que
+   a feature vai criar (`src/worker.ts`, `src/modules/webhooks/*`) ficam como `code span`,
+   com nota de que são novos: nunca linkar caminho inexistente.
+8. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp** em nenhuma seção. A origem de
+   cada afirmação vai para o Tracker.
+9. Ao terminar o texto, **invocar `design-docs-diagrams`** para acrescentar a seção
    "Diagramas" ao fim do próprio `docs/FDD.md` (não há arquivo de diagramas separado).
-9. Atualizar as linhas `fdd` (e depois `diagrams`) em `docs/_workbench/run-state.md`.
+10. Atualizar as linhas `fdd` (e depois `diagrams`) em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -58,7 +62,9 @@ description: >-
 - [ ] Matriz de erros só com `WEBHOOK_*`.
 - [ ] Fluxos cobrem outbox, worker, retry, DLQ.
 - [ ] Observabilidade cita métricas, logs e tracing.
-- [ ] Seção 12 nomeia ≥ 4 caminhos de arquivo que existem no repositório.
+- [ ] Seção 12 nomeia ≥ 4 arquivos que existem no repositório, cada um link relativo com `#Lnn`.
+- [ ] Toda menção a arquivo real do repo (qualquer seção) é link relativo; `src/worker.ts` e
+      `src/modules/webhooks/*` ficam como `code span` (são novos). Nenhum link quebrado.
 - [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
 - [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
 - [ ] Não repete narrativa de negócio do PRD nem reabre decisão de ADR.

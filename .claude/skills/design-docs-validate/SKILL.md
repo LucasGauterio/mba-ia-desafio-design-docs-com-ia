@@ -46,7 +46,8 @@ description: >-
 - ≥ 4 blocos de endpoint HTTP com exemplo `json` de request e response e status codes.
 - `grep -o 'WEBHOOK_[A-Z_]*'` retorna ≥ 5 códigos distintos; nenhum código de erro do
   módulo sem prefixo `WEBHOOK_`.
-- Seção 12: extrair caminhos `src/...` e `prisma/...`; ≥ 4 distintos; **cada um existe** no repo.
+- Seção 12: ≥ 4 arquivos distintos citados; **cada um** como link relativo
+  `](../src/...` / `](../prisma/...`, com âncora `#Lnn`; **cada href existe** no repo.
 - "Observabilidade" menciona métrica(s), log(s) e tracing/correlação.
 - Seção "Diagramas" no fim do arquivo: 4 a 10 blocos ```mermaid, sem elemento ausente do
   corpo; nenhum arquivo `docs/diagrams/` separado.
@@ -56,14 +57,21 @@ description: >-
   `## Consequências`.
 - Conjunto cobre ≥ 5 das 6 decisões principais (buscar por palavras-chave: outbox, retry/
   backoff/DLQ, HMAC, X-Event-Id / at-least-once, worker/polling, reuso/AppError).
-- ≥ 1 ADR contém caminho `src/...` que existe no repo.
+- ≥ 1 ADR referencia código real; toda referência de arquivo na seção "Referências" é link
+  relativo `](../../src/...` com âncora `#Lnn` e resolve.
 - Nenhum ADR com bloco ```` ``` ```` de código-fonte.
 
 ### Tracker
 - Cabeçalho de tabela com colunas ID, Documento, Tipo, Conteúdo, Fonte, Localização.
 - Contar linhas; contar linhas com `TRANSCRICAO` + regex `\[\d{2}:\d{2}\] \w+` → ≥ 70%.
 - Contar linhas com `CODIGO` + caminho existente → ≥ 5.
-- Amostrar 10 timestamps e conferir na `TRANSCRICAO.md`; amostrar caminhos e conferir no repo.
+- **Toda** célula `Documento` casa `\[[^]]+\]\([^)]+\)` (link); **toda** célula
+  `Localização` idem. Zero células em texto plano.
+- Extrair cada `href` das colunas `Documento` e `Localização`; resolver relativo a `docs/`;
+  **todo arquivo alvo existe**. Linhas `TRANSCRICAO` apontam `../TRANSCRICAO.md#Lnn`;
+  linhas `CODIGO` que citam símbolo têm `#Lnn`.
+- Amostrar 10 timestamps e conferir na `TRANSCRICAO.md` (o `[hh:mm] Nome` do texto existe
+  na linha `#Lnn` apontada); amostrar caminhos `CODIGO` e conferir no repo.
 - Estimar cobertura: itens rastreados / itens identificáveis nos docs → ≥ 80%.
 
 ### README
@@ -77,6 +85,19 @@ description: >-
   `docs/_workbench/`. O placeholder de formato `[hh:mm]` (com letras) pode aparecer no
   `README.md` e no plano do processo descrevendo a convenção.
 - Nenhum travessão longo (em-dash) em nenhum documento do pacote.
+
+### Links de arquivo do repositório (regra `repo-file-links.md`)
+- Em `docs/PRD.md`, `docs/RFC.md`, `docs/FDD.md`, `docs/adrs/*.md`, `docs/TRACKER.md`,
+  `README.md`, `CLAUDE.md`: extrair todo link Markdown `](...)` cujo alvo aponta para um
+  arquivo do repo (`src/`, `prisma/`, `tests/`, `../TRANSCRICAO.md`, outro doc do pacote,
+  `.claude/...`, `package.json`, ...). Resolver o caminho relativo a partir da pasta do
+  arquivo que linka. **Todo alvo (sem `#Lnn`) existe.**
+- Nenhuma menção a `src/...` / `prisma/...` / `tests/...` **em texto plano** (fora de bloco
+  de código) nesses documentos: `grep -nE '(^|[^(/\w.])(src|prisma|tests)/[A-Za-z0-9_./-]+\.(ts|prisma|json)' <doc>`
+  não deve retornar ocorrência que não esteja dentro de `](...)` ou de ``` ``` ```. Exceção:
+  arquivos que a feature vai criar (`src/worker.ts`, `src/modules/webhooks/...`) como `code span`.
+- Links para código que citam um símbolo específico trazem `#Lnn`; conferir por amostragem
+  que a linha apontada contém mesmo a declaração citada.
 
 ### Consistência / anti-escopo
 - Para cada item de `honor-rejected-scope.md`, `grep` nos docs finais: não pode aparecer

@@ -31,8 +31,11 @@ description: >-
    situação em prosa ("adiado para a próxima fase", "fora de escopo, projeto do frontend"),
    sem timestamp.
 5. **Riscos:** ≥ 2 completos (probabilidade, impacto, mitigação em subitens, contingência).
-6. **Decisões e trade-offs:** resumo; o detalhe fica nos ADRs (linkar, não repetir).
-7. Nível de produto: **não** descer a endpoints, códigos de erro ou infra.
+6. **Decisões e trade-offs:** resumo; o detalhe fica nos ADRs (linkar com `adrs/ADR-....md`,
+   não repetir). Link para o RFC/FDD quando citá-los = `RFC.md`, `FDD.md`.
+7. Nível de produto: **não** descer a endpoints, códigos de erro ou infra. Se um arquivo
+   real do repo for citado (raro no PRD), é link relativo com `#Lnn` (regra
+   `repo-file-links.md`).
 8. **Prosa limpa: sem `[hh:mm]` nem colchetes de timestamp.** A origem vai para o Tracker.
 9. Atualizar a linha `prd` em `docs/_workbench/run-state.md`.
 
@@ -49,4 +52,5 @@ description: >-
 - [ ] "Riscos" com ≥ 2 riscos completos.
 - [ ] **Sem `[hh:mm]` nem citações de fonte no corpo.**
 - [ ] Toda afirmação verificável tem linha correspondente no `docs/TRACKER.md`.
+- [ ] Referências a outro doc do pacote e a arquivo do repo são links relativos válidos.
 - [ ] Nada contradiz transcrição/código; não desce ao detalhe do FDD.

@@ -99,16 +99,21 @@ processando dentro do SLA, retry/DLQ exercitados, revisão de segurança da assi
 Riscos técnicos com probabilidade, impacto, mitigação (subitens), contingência.
 
 ## 12. Integração com o sistema existente  (SEÇÃO OBRIGATÓRIA DESTE DESAFIO)
-Nomear **pelo menos 4 caminhos de arquivo reais** do código base e descrever como o módulo
-de webhooks se integra a cada um. Use `.claude/references/codebase/integration-points.md`.
-Cobrir no mínimo:
+Nomear **pelo menos 4 arquivos reais** do código base e descrever como o módulo de webhooks
+se integra a cada um. Use `.claude/references/codebase/integration-points.md`. Cada arquivo
+é **link relativo com âncora de linha** a partir de `docs/FDD.md`
+(`[\`order.service.ts\`](../src/modules/orders/order.service.ts#L120)`), apontando a linha
+do símbolo citado (ver `.claude/rules/repo-file-links.md`). Cobrir no mínimo:
 - `src/modules/orders/order.service.ts`: como `changeStatus` é estendido (função
   `publishWebhookEvent(tx, order, fromStatus, toStatus)` chamada dentro da `$transaction`).
-- `src/shared/errors/*`: como as classes de erro são reutilizadas / estendidas (`WEBHOOK_*`).
+- `src/shared/errors/app-error.ts` e `src/shared/errors/http-errors.ts`: como as classes de
+  erro são reutilizadas / estendidas (`WEBHOOK_*`).
 - `src/middlewares/auth.middleware.ts`: `authenticate` nas rotas, `requireRole('ADMIN')` no replay.
 - `src/config/database.ts` / novo entrypoint: worker abre `PrismaClient` próprio.
 - (e.g.) `src/modules/orders/order.status.ts`, `src/shared/logger/index.ts`,
   `src/middlewares/validate.middleware.ts`, `src/app.ts` (`buildControllers`/`buildApiRouter`).
+Arquivos que a feature vai criar (`src/worker.ts`, `src/modules/webhooks/*`) ficam como
+`code span` simples, com nota de que são novos: não há link para caminho inexistente.
 
 ## 13. Diagramas
 Seção final acrescentada por `design-docs-diagrams` (ver `diagrams.md`): 4 a 6 diagramas
@@ -122,8 +127,10 @@ Mermaid embutidos, cada um apontando a seção que ilustra. Não é um arquivo s
 - [ ] Matriz de erros usa exclusivamente códigos `WEBHOOK_*`.
 - [ ] Fluxos cobrem outbox, worker, retry e DLQ.
 - [ ] Observabilidade cita métricas, logs **e** tracing/correlação.
-- [ ] Seção "Integração com o sistema existente" nomeia ≥ 4 caminhos de arquivo **que
-      existem** no repositório.
+- [ ] Seção "Integração com o sistema existente" nomeia ≥ 4 arquivos **que existem** no
+      repositório, cada um como link relativo com âncora de linha (`#Lnn`).
+- [ ] Toda menção a arquivo real do repo (qualquer seção) é link relativo; caminho novo
+      (`src/worker.ts`, `src/modules/webhooks/*`) fica como `code span`, nunca link quebrado.
 - [ ] Nenhuma decisão é reaberta; nenhum item de negócio é repetido do PRD.
 - [ ] Sem `[hh:mm]` nem citações de fonte no corpo; toda afirmação verificável tem linha
       no `docs/TRACKER.md`.

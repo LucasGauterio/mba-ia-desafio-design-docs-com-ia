@@ -27,14 +27,19 @@ cada afirmação à sua origem aqui.
    alternativa, questão em aberto, contrato, erro, integração, risco, métrica), criar uma
    linha na tabela com ID prefixado (`PRD-FR-01`, `RFC-ALT-02`, `FDD-CONTRATO-03`,
    `FDD-INT-02`, `ADR-002`, ...).
-3. Preencher `Fonte` (`TRANSCRICAO` ou `CODIGO`) e `Localização`, cruzando com o ledger:
-   - `TRANSCRICAO` → `[hh:mm] Nome` real (vem do ledger), conferido na transcrição.
-   - `CODIGO` → caminho de arquivo real, conferido no repositório.
-4. Se um item não tem origem localizável: **voltar ao documento** e corrigir/remover; não
+3. `Documento` = link relativo a partir de `docs/`: `[docs/PRD.md](PRD.md)`,
+   `[docs/adrs/ADR-....md](adrs/ADR-....md)`.
+4. Preencher `Fonte` (`TRANSCRICAO` ou `CODIGO`) e `Localização` (sempre link relativo),
+   cruzando com o ledger:
+   - `TRANSCRICAO` → `[[hh:mm] Nome](../TRANSCRICAO.md#Lnn)`. O `[hh:mm] Nome` vem do
+     ledger; achar a linha real com `grep -n` na transcrição e pôr como âncora `#Lnn`.
+   - `CODIGO` → `[src/...#Lnn](../src/...#Lnn)`. Abrir o arquivo, achar a linha do símbolo,
+     usar como âncora. Sem trecho específico, linkar o arquivo sem `#Lnn`.
+5. Se um item não tem origem localizável: **voltar ao documento** e corrigir/remover; não
    inventar origem.
-5. Conferir os limiares: ≥ 80% de cobertura; ≥ 70% das linhas `TRANSCRICAO` com timestamp
-   válido; ≥ 5 linhas `CODIGO` com arquivo real.
-6. Atualizar a linha `tracker` em `docs/_workbench/run-state.md`.
+6. Conferir os limiares: ≥ 80% de cobertura; ≥ 70% das linhas `TRANSCRICAO` com timestamp
+   válido; ≥ 5 linhas `CODIGO` com arquivo real; **todo `href` de link resolve**.
+7. Atualizar a linha `tracker` em `docs/_workbench/run-state.md`.
 
 ## Saída
 
@@ -48,3 +53,6 @@ números apurados.
 - [ ] ≥ 70% das linhas: Fonte = TRANSCRICAO com `[hh:mm] Nome` válido.
 - [ ] ≥ 5 linhas: Fonte = CODIGO com caminho real.
 - [ ] Todo timestamp existe na `TRANSCRICAO.md`; todo caminho existe no repo.
+- [ ] **Toda** célula `Documento` e `Localização` é link relativo `[texto](href)`; nenhum
+      `href` quebrado (conferir com um script que testa cada caminho).
+- [ ] Linhas `TRANSCRICAO` têm âncora `#Lnn`; linhas `CODIGO` que citam um símbolo têm `#Lnn`.

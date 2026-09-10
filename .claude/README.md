@@ -28,7 +28,7 @@ readme, validation. Checkpoints de revisão após `ledger`, após `adr+rfc`, ap�
 |---|---|
 | `skills/design-docs*` | uma skill por etapa; `design-docs` é o orquestrador retomável |
 | `commands/` | atalhos `/design-docs*` para as skills |
-| `rules/` | restrições sempre ativas (código read-only, rastreabilidade, altura dos docs, escopo rejeitado) |
+| `rules/` | restrições sempre ativas (código read-only, rastreabilidade, altura dos docs, escopo rejeitado, links de arquivo com linha) |
 | `requirements/deliverables.default.md` | perfil de entregáveis (o do `DESAFIO.md`); troque para outra spec |
 | `references/codebase/` | baseline da aplicação (gerado por `design-docs-baseline`) |
 | `references/architecture/` | guia de FDD, RFC, ADR (MADR), diagramas, C4 |
@@ -61,11 +61,14 @@ gitignored (nunca versionado).
 RUN=$(date +%Y%m%d-%H%M%S)
 git worktree add -b design-docs/$RUN .worktrees/design-docs-run-$RUN dev
 cd .worktrees/design-docs-run-$RUN
-claude -p "/design-docs @TRANSCRICAO.md" --permission-mode acceptEdits --output-format stream-json | tee run.log
+claude -p "/design-docs @TRANSCRICAO.md --restart --nao-interativo" --permission-mode acceptEdits | tee run.log
 claude -p "/design-docs-validate" --permission-mode acceptEdits | tee validation.md
 # ler validation.md; se houver falhas, corrigir os assets em dev e refazer a run
 cd ../.. && git worktree remove .worktrees/design-docs-run-$RUN     # ao terminar
 ```
+
+`--nao-interativo` é obrigatório aqui: `claude -p` não tem como responder aos checkpoints,
+então o orquestrador registra a nota e segue.
 
 Correções vão sempre nos **assets do workflow** em `dev`, nunca na worktree da run. Cada
 ciclo vira insumo da seção "Iterações e ajustes" do README do processo.

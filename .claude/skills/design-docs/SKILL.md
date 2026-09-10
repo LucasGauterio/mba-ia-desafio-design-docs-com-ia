@@ -25,6 +25,10 @@ Argumentos aceitos (`$ARGUMENTS`):
   quando existir na raiz; se não existir, seguir só com
   `.claude/requirements/deliverables.default.md` e marcar `spec: (nenhuma)`.
 - **`--restart`**: ignora o run-state atual e recomeça do zero.
+- **`--nao-interativo`** (ou execução via `claude -p`, sem TTY): **não pare nos
+  checkpoints**. Em cada checkpoint, escreva a nota de revisão no run-state (campo
+  `notas de checkpoint`) e siga direto para o próximo estágio. Commits por estágio viram
+  best-effort: se `git commit` for bloqueado, seguir e deixar tudo no working tree.
 - Sem nenhum argumento: retomar a run em andamento.
 
 ## Resolução dos inputs (fazer no início de uma run nova)
@@ -67,7 +71,9 @@ As skills seguintes (`design-docs-spec`, `-ledger`, `-rfc`) leem esses valores d
   - feature.slug: <kebab-case curto>
   - reviewers: <Nome (papel), ... : participantes da transcrição>
 - **iteração:** 1
+- **modo:** interativo | nao-interativo
 - **último score de validação:** (ainda não rodou)
+- **notas de checkpoint:** (preenchido no modo não-interativo)
 - **próxima ação:** rodar estágio `baseline`
 
 | Estágio | Status | Saída |
@@ -88,20 +94,21 @@ As skills seguintes (`design-docs-spec`, `-ledger`, `-rfc`) leem esses valores d
 ## Ordem de execução
 
 Para cada estágio ainda `pendente`, marcar `em progresso`, invocar a skill, marcar
-`concluído`, atualizar "próxima ação" e commitar (`chore(run): <estágio>`).
+`concluído`, atualizar "próxima ação" e commitar (`chore(run): <estágio>`). Commit
+bloqueado (ambiente sem permissão) não trava o pipeline: seguir e deixar no working tree.
 
 1. `baseline` → skill **design-docs-baseline**
 2. `spec` → skill **design-docs-spec**
 3. `ledger` → skill **design-docs-ledger**
-  : **checkpoint:** revisar o ledger com o usuário antes de seguir (classificação correta?
-   descartados de fora?).
+  : **checkpoint:** revisar o ledger (classificação correta? descartados de fora?). No modo
+   não-interativo, registrar a nota no run-state e seguir.
 4. `adr` → skill **design-docs-adr**
 5. `rfc` → skill **design-docs-rfc**
-  : **checkpoint:** ADR + RFC prontos para revisão.
+  : **checkpoint:** ADR + RFC prontos para revisão. (não-interativo: seguir)
 6. `fdd` → skill **design-docs-fdd** (que aciona **design-docs-diagrams** → estágio
    `diagrams`, que acrescenta a seção "Diagramas" ao fim do `docs/FDD.md`)
 7. `prd` → skill **design-docs-prd**
-  : **checkpoint:** FDD + PRD prontos para revisão.
+  : **checkpoint:** FDD + PRD prontos para revisão. (não-interativo: seguir)
 8. `tracker` → skill **design-docs-tracker**
 9. `readme` → skill **design-docs-readme**
 10. `validation` → skill **design-docs-validate**

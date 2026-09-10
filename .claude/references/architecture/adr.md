@@ -52,8 +52,10 @@ era e por que não foi escolhida.]
 - Impacto operacional / restrições futuras.]
 
 ## Referências
-[3 a 5 itens. Caminhos de arquivo (`src/modules/orders/order.service.ts`), links para
-o RFC e outros ADRs. SEM trechos de código, SEM timestamps.]
+[3 a 5 itens. Cada arquivo do repo é **link relativo com âncora de linha** a partir de
+`docs/adrs/` (ver `.claude/rules/repo-file-links.md`):
+`[\`order.service.ts\`](../../src/modules/orders/order.service.ts#L120)`. Links para o RFC
+(`../RFC.md`) e outros ADRs (`ADR-002-....md`). SEM trechos de código, SEM timestamps.]
 ```
 
 Proibido no ADR: campos de header além de Status / Data / Decisões relacionadas; seções
@@ -81,15 +83,17 @@ Decisões secundárias que **podem** virar ADR adicional ou ficar só no FDD: sn
 payload na inserção, formato do payload, timeout de 10 s, conjunto de headers.
 
 **Pelo menos 1 ADR** deve referenciar explicitamente arquivos/módulos/classes do código
-existente (o ADR de reuso é o candidato natural: cita `src/shared/errors/`,
-`src/shared/logger/`, `src/modules/orders/order.service.ts`, `src/app.ts`).
+existente (o ADR de reuso é o candidato natural: cita `src/shared/errors/app-error.ts`,
+`src/shared/logger/index.ts`, `src/modules/orders/order.service.ts`, `src/app.ts`), sempre
+como link relativo com âncora de linha.
 
 ## Checklist (cada ADR só está pronto quando)
 
 - [ ] Header só com Status, Data e (se houver) Decisões relacionadas.
 - [ ] As 7 seções presentes: Contexto e problema, Decisão, Alternativas consideradas
       (mínimo 1), Consequências (positivas **e** negativas com trade-off), Referências.
-- [ ] Sem trechos de código; até 5 referências de arquivo.
+- [ ] Sem trechos de código; até 5 referências de arquivo, cada uma link relativo com
+      âncora de linha (`#Lnn`), e cada link resolvendo para um caminho real.
 - [ ] **Sem citações de fonte no corpo** (`[hh:mm]`, colchetes de timestamp).
 - [ ] Toda afirmação verificável do ADR tem linha correspondente no `docs/TRACKER.md`.
 - [ ] O conjunto cobre pelo menos 5 das 6 decisões principais; pelo menos 1 ADR referencia

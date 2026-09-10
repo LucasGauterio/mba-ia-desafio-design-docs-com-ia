@@ -136,6 +136,8 @@ A entrega deste repositório é **documental**. Regras sempre ativas (`.claude/r
   cada documento na sua altura; referência cruzada em vez de cópia.
 - [`honor-rejected-scope.md`](.claude/rules/honor-rejected-scope.md): itens que a reunião
   descartou/adiou não viram requisito.
+- [`repo-file-links.md`](.claude/rules/repo-file-links.md): toda menção a um arquivo real do
+  repositório é link relativo; código citando um trecho leva âncora de linha `#Lnn`.
 
 ## Workflow `design-docs`
 
